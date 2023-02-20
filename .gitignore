@@ -1,3 +1,23 @@
+# pdfs
+plots/*
+
+# profiler
+stats
+
+# mac non-sense
+.DS_Store
+ 
+# data folder
+data/*
+examples/data/*
+
+# vscode settings
+.vscode/*
+
+
+#####################
+# PYTHON TEMPLATE vvvvv
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
