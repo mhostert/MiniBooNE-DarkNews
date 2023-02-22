@@ -11,7 +11,7 @@ from DarkNews import const
 from DarkNews import plot_tools as pt
 
 from ToyBNB import analysis
-from ToyBNB import analysis_decay
+from ToyBNB import decayer
 from ToyBNB import fourvec as fv
 from ToyBNB import toy_logger
 
@@ -35,7 +35,7 @@ def plot_all_rates(df, case_name, Nevents=None, truth_plots=False, title=None, p
         title = case_name
 
     # get observables at MiniBooNE
-    bag_reco_MB = analysis_decay.decay_selection(
+    bag_reco_MB = decayer.decay_selection(
                                                 analysis.compute_spectrum(df, EVENT_TYPE='both'),
                                                 experiment='miniboone',
                                                 l_decay_proper_cm=df.attrs['N5_ctau0'])

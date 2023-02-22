@@ -99,21 +99,20 @@ def safe_log(di,xi):
 def chi2_binned_rate(NP_MC, NPevents, back_MC,D, sys=[0.1,0.1]):
     err_flux = sys[0]
     err_back = sys[1]
-    
+
     # shape of new physics prediction normalized to NPevents
     if np.sum(NP_MC)!=0:
         NP_MC  = (NP_MC/np.sum(NP_MC)) * NPevents
 
     dpoints = len(D)
-    
+
     def chi2bin(nuis):
         alpha=nuis[:dpoints]
         beta = nuis[dpoints:]
 
         mu = NP_MC*(1+alpha) + back_MC*(1+beta)
-        
-        return 2*np.sum(mu - D + safe_log(D, mu) ) + np.sum(alpha**2/(err_flux**2)) + np.sum(beta**2 /(err_back**2))
 
+        return 2*np.sum(mu - D + safe_log(D, mu) ) + np.sum(alpha**2/(err_flux**2)) + np.sum(beta**2 /(err_back**2))
     
     cons = ({'type': 'ineq', 'fun': lambda x: x})
     

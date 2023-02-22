@@ -10,6 +10,6 @@ toy_logger = logging.getLogger(__name__ + ".logger")
 
 # Analysis and plotting modules 
 from ToyBNB import analysis
-from ToyBNB import analysis_decay
-from ToyBNB import cuts
+from ToyBNB import decayer
+from ToyBNB import fastmc
 from ToyBNB import plot_tools
