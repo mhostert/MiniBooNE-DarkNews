@@ -9,22 +9,23 @@ from DarkNews import Cfourvec as Cfv
 
 def miniboone_reco_eff_func():
     # Single photon efficiencies from data release
-    eff = np.array([0.0,0.089,0.135,0.139,0.131,0.123,0.116,0.106,0.102,0.095,0.089,0.082,0.073,0.067,0.052,0.026])
-    enu = np.array([0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.3,1.5,1.7,1.9,2.1])
-    enu_c =  enu[:-1]+(enu[1:] - enu[:-1])/2
-    return interp1d(enu_c, eff, fill_value=(eff[0],eff[-1]), bounds_error=False, kind='nearest')
+    eff = np.array([0.0, 0.089, 0.135, 0.139, 0.131, 0.123, 0.116, 0.106, 0.102, 0.095, 0.089, 0.082, 0.073, 0.067, 0.052, 0.026])
+    enu = np.array([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1])
+    enu_c = enu[:-1] + (enu[1:] - enu[:-1]) / 2
+    return interp1d(enu_c, eff, fill_value=(eff[0], eff[-1]), bounds_error=False, kind="nearest")
+
 
 # NOTE: This function is not used in the paper.
 def microboone_reco_eff_func():
     # Total nueCCQE efficiency -- NuMI flux averaged xsec paper.
-    E_numi_eff_edge = np.array([0,2.97415218e-1,4.70796471e-1,7.01196105e-1,9.88922361e-1,1.43183725e+0,3.00810009e+0,6.00428361e+0])
-    nueCCQE_numi_eff_edge = np.array([6.13255034e-2,1.44127517e-1,2.12332215e-1,2.64681208e-1,2.76761745e-1,2.97902685e-1,2.57885906e-1,2.60151007e-1])
-    E_numi_eff = (E_numi_eff_edge[1:] - E_numi_eff_edge[:-1])/2 + E_numi_eff_edge[:-1]
+    E_numi_eff_edge = np.array([0, 2.97415218e-1, 4.70796471e-1, 7.01196105e-1, 9.88922361e-1, 1.43183725e0, 3.00810009e0, 6.00428361e0])
+    nueCCQE_numi_eff_edge = np.array([6.13255034e-2, 1.44127517e-1, 2.12332215e-1, 2.64681208e-1, 2.76761745e-1, 2.97902685e-1, 2.57885906e-1, 2.60151007e-1])
+    E_numi_eff = (E_numi_eff_edge[1:] - E_numi_eff_edge[:-1]) / 2 + E_numi_eff_edge[:-1]
     nueCCQE_numi_eff = nueCCQE_numi_eff_edge[:-1]
-    return interp1d(E_numi_eff, nueCCQE_numi_eff, fill_value=(nueCCQE_numi_eff[0], nueCCQE_numi_eff[-1]), bounds_error=False, kind='nearest')
+    return interp1d(E_numi_eff, nueCCQE_numi_eff, fill_value=(nueCCQE_numi_eff[0], nueCCQE_numi_eff[-1]), bounds_error=False, kind="nearest")
 
 
-def apply_reco_efficiencies(Energy, w, exp='miniboone'):
+def apply_reco_efficiencies(Energy, w, exp="miniboone"):
     """reco_efficiencies apply reconstruction efficiencies as a function of energy (vis or Enu)
 
     Parameters
@@ -41,15 +42,16 @@ def apply_reco_efficiencies(Energy, w, exp='miniboone'):
     np.array
         the reweighted event weights.
     """
-    if exp=='miniboone':
+    if exp == "miniboone":
         eff_func = miniboone_reco_eff_func()
-    elif exp=='microboone':
+    elif exp == "microboone":
         eff_func = microboone_reco_eff_func()
 
-    return eff_func(Energy)*w
+    return eff_func(Energy) * w
+
 
 # Full analysis to get reconstructed energy spectrum for BNB experiments
-def reco_nueCCQElike_Enu(df, exp='miniboone', cut='circ1'):
+def reco_nueCCQElike_Enu(df, exp="miniboone", cut="circ1"):
     """compute_spectrum _summary_
 
     Parameters
@@ -75,51 +77,48 @@ def reco_nueCCQElike_Enu(df, exp='miniboone', cut='circ1'):
     """
 
     df = df.copy(deep=True)
-    
-    # Initial weigths
-    w = df['w_event_rate'].values # typically already selected for fiducial volume
 
-    if 'P_decay_photon' in df.columns:
-        
+    # Initial weigths
+    w = df["w_event_rate"].values  # typically already selected for fiducial volume
+
+    if "P_decay_photon" in df.columns:
         # Smear photon
-        pgamma = fastmc.smear_samples(df['P_decay_photon'], mass=0.0, exp=exp)
+        pgamma = fastmc.smear_samples(df["P_decay_photon"], mass=0.0, exp=exp)
 
         # Reco quantities for nueCCQE-like events
-        Evis = pgamma[:,0]
+        Evis = pgamma[:, 0]
         costheta = Cfv.get_cosTheta(pgamma)
 
         # no pre-selection needed in this case
         w_preselection = w
 
-    elif 'P_decay_ell_minus' in df.columns:
-        
+    elif "P_decay_ell_minus" in df.columns:
         # Smear e+ and e-
-        pep = fastmc.smear_samples(df['P_decay_ell_plus'], exp=exp)
-        pem = fastmc.smear_samples(df['P_decay_ell_minus'], exp=exp)
-        
-        # kinetic energy of e+e- 
-        Evis = pep[:,0] + pem[:,0] - 2*const.m_e
-        
-        # angle wrt the beam direction using the sum of e+e-
-        costheta = Cfv.get_cosTheta(pep+pem)
-        
-        # Evis, theta_beam, w, eff_s = signal_events(pep, pem, Delta_costheta, costhetaep, costhetaem, w, threshold=ep.THRESHOLD[exp], angle_max=ep.ANGLE_MAX[exp], event_type=event_type)
-        w_preselection = apply_pre_selection(w, pep, pem, kind='nueCCQElike', cut=cut)
+        pep = fastmc.smear_samples(df["P_decay_ell_plus"], exp=exp)
+        pem = fastmc.smear_samples(df["P_decay_ell_minus"], exp=exp)
 
-    elif 'P_decay_photon_1' in df.columns:
-        
-        # Smear two photons
-        pep = fastmc.smear_samples(df['P_decay_photon_1'], exp=exp)
-        pem = fastmc.smear_samples(df['P_decay_photon_2'], exp=exp)
-        
-        # kinetic energy of e+e- 
-        Evis = pep[:,0] + pem[:,0]
-        
+        # kinetic energy of e+e-
+        Evis = pep[:, 0] + pem[:, 0] - 2 * const.m_e
+
         # angle wrt the beam direction using the sum of e+e-
-        costheta = Cfv.get_cosTheta(pep+pem)
-        
+        costheta = Cfv.get_cosTheta(pep + pem)
+
         # Evis, theta_beam, w, eff_s = signal_events(pep, pem, Delta_costheta, costhetaep, costhetaem, w, threshold=ep.THRESHOLD[exp], angle_max=ep.ANGLE_MAX[exp], event_type=event_type)
-        w_preselection = apply_pre_selection(w, pep, pem, kind='nueCCQElike', cut=cut)
+        w_preselection = apply_pre_selection(w, pep, pem, kind="nueCCQElike", cut=cut)
+
+    elif "P_decay_photon_1" in df.columns:
+        # Smear two photons
+        pep = fastmc.smear_samples(df["P_decay_photon_1"], exp=exp)
+        pem = fastmc.smear_samples(df["P_decay_photon_2"], exp=exp)
+
+        # kinetic energy of e+e-
+        Evis = pep[:, 0] + pem[:, 0]
+
+        # angle wrt the beam direction using the sum of e+e-
+        costheta = Cfv.get_cosTheta(pep + pem)
+
+        # Evis, theta_beam, w, eff_s = signal_events(pep, pem, Delta_costheta, costhetaep, costhetaem, w, threshold=ep.THRESHOLD[exp], angle_max=ep.ANGLE_MAX[exp], event_type=event_type)
+        w_preselection = apply_pre_selection(w, pep, pem, kind="nueCCQElike", cut=cut)
     else:
         toy_logger.error(f"Could not find pre-selection for the events in DataFrame columns: {df.columns}")
 
@@ -133,17 +132,18 @@ def reco_nueCCQElike_Enu(df, exp='miniboone', cut='circ1'):
 
     ############################################################################
     # return reco observables of LEE
-    df['reco_Enu'] = reco_enu
-    df['reco_w'] = w_selection
-    df['reco_Evis'] = Evis
-    df['reco_theta_beam'] = np.arccos(costheta)
-    df['reco_costheta_beam'] = costheta
-    df['reco_eff'] = w_selection.sum()/w.sum()
+    df["reco_Enu"] = reco_enu
+    df["reco_w"] = w_selection
+    df["reco_Evis"] = Evis
+    df["reco_theta_beam"] = np.arccos(costheta)
+    df["reco_costheta_beam"] = costheta
+    df["reco_eff"] = w_selection.sum() / w.sum()
 
     return df
 
+
 # Full analysis to get reconstructed energy spectrum for BNB experiments
-def reco_pi0like_invmass(df, exp='miniboone', cuts='circ1'):
+def reco_pi0like_invmass(df, exp="miniboone", cuts="circ1"):
     """compute_spectrum _summary_
 
     Parameters
@@ -158,7 +158,7 @@ def reco_pi0like_invmass(df, exp='miniboone', cuts='circ1'):
                 'photon' assumes this is a photon and therefore always a single shower
             for lepton or photon pairs:
                 circ0, circ1, diag -- corresponding to Kelly&Kopp criteria
-                invmass -- corresponding to invmass criteria from Patterson 
+                invmass -- corresponding to invmass criteria from Patterson
     Returns
     -------
     pd.DatagFrame
@@ -166,35 +166,35 @@ def reco_pi0like_invmass(df, exp='miniboone', cuts='circ1'):
     """
 
     df = df.copy(deep=True)
-    
-    # Initial weigths
-    w = df['w_event_rate'].values # typically already selected for fiducial volume
 
-    if 'P_decay_photon' in df.columns:
-    
-        toy_logger.error('pi0like_invmass not defined for single photon events')    
-    
+    # Initial weigths
+    w = df["w_event_rate"].values  # typically already selected for fiducial volume
+
+    if "P_decay_photon" in df.columns:
+        toy_logger.error("pi0like_invmass not defined for single photon events")
+
     else:
         # Smear e+ and e-
-        pep = fastmc.smear_samples(df['P_decay_ell_plus'], exp=exp)
-        pem = fastmc.smear_samples(df['P_decay_ell_minus'], exp=exp)
-        Evis = pep[:,0] + pem[:,0]
-        
+        pep = fastmc.smear_samples(df["P_decay_ell_plus"], exp=exp)
+        pem = fastmc.smear_samples(df["P_decay_ell_minus"], exp=exp)
+        Evis = pep[:, 0] + pem[:, 0]
+
         # Evis, theta_beam, w, eff_s = signal_events(pep, pem, Delta_costheta, costhetaep, costhetaem, w, threshold=ep.THRESHOLD[exp], angle_max=ep.ANGLE_MAX[exp], event_type=event_type)
-        w_preselection = apply_pre_selection(w, pep, pem, kind='pi0like', cuts=cuts)
+        w_preselection = apply_pre_selection(w, pep, pem, kind="pi0like", cuts=cuts)
 
     w_selection = apply_reco_efficiencies(Evis, w_preselection, exp=exp)
 
     ############################################################################
     # return reco observables of LEE
-    df['reco_mgg'] = Cfv.inv_mass(pep+pem, pep+pem)
-    df['reco_w'] = w_selection
-    df['reco_Evis'] = Evis
-    df['reco_eff'] = w_selection.sum()/w.sum()
+    df["reco_mgg"] = Cfv.inv_mass(pep + pem, pep + pem)
+    df["reco_w"] = w_selection
+    df["reco_Evis"] = Evis
+    df["reco_eff"] = w_selection.sum() / w.sum()
 
     return df
 
-def apply_pre_selection(w, pep, pem, kind='nueCCQElike', cut='circ1'):
+
+def apply_pre_selection(w, pep, pem, kind="nueCCQElike", cut="circ1"):
     """apply_pre_selection pre-select events based on single- or two-rings criteria
 
     Parameters
@@ -206,7 +206,7 @@ def apply_pre_selection(w, pep, pem, kind='nueCCQElike', cut='circ1'):
     pem : np.array
         electron or photon momenta w/ shape (Nevents, 4)
     kind : str, optional
-        nueCCQElike (1 rings) or pi0like (2 rings), by default 'nueCCQElike'. 
+        nueCCQElike (1 rings) or pi0like (2 rings), by default 'nueCCQElike'.
     cut : str, optional
         criteria to be used. By default 'circ1'. Other options are:
         *   'circ1' picks events based on Kelly&Kopp criteria: r = sqrt( (1 - CosTheta)^2/4 + (1 - Emax/Etot)^2 )
@@ -220,47 +220,49 @@ def apply_pre_selection(w, pep, pem, kind='nueCCQElike', cut='circ1'):
         Reweighted weights with selection criteria applied.
     """
     # some useful kinematics
-    emax = np.where(pep[:,0] >= pem[:,0], pep[:,0], pem[:,0])
-    Evis = pep[:,0] + pem[:,0]
-    Delta_costheta = Cfv.get_cos_opening_angle(pem,pep)
+    emax = np.where(pep[:, 0] >= pem[:, 0], pep[:, 0], pem[:, 0])
+    Evis = pep[:, 0] + pem[:, 0]
+    Delta_costheta = Cfv.get_cos_opening_angle(pem, pep)
 
     # load the r cut function
     func_r_cut = fastmc.get_r_cut_func(cut=cut)
 
     # apply pre-selection cuts
-    if cut == 'circ1':
-        r = np.sqrt( (1 - Delta_costheta)**2/4 + (1 - emax/Evis)**2 )
-        condition = (r < func_r_cut(Evis))
+    if cut == "circ1":
+        r = np.sqrt((1 - Delta_costheta) ** 2 / 4 + (1 - emax / Evis) ** 2)
+        condition = r < func_r_cut(Evis)
 
-    elif cut == 'circ0':
-        r = np.sqrt( (1 + Delta_costheta)**2/4 + (emax/Evis)**2 )
-        condition = (r > func_r_cut(Evis))
+    elif cut == "circ0":
+        r = np.sqrt((1 + Delta_costheta) ** 2 / 4 + (emax / Evis) ** 2)
+        condition = r > func_r_cut(Evis)
 
-    elif cut == 'diag':
-        r  = 1 - 1/2*((1 + Delta_costheta)/2 + emax/Evis)
-        condition = (r < func_r_cut(Evis))
+    elif cut == "diag":
+        r = 1 - 1 / 2 * ((1 + Delta_costheta) / 2 + emax / Evis)
+        condition = r < func_r_cut(Evis)
 
-    elif cut == 'invmass':
-        mee = Cfv.inv_mass(pep+pem, pep+pem)
-        ovl = (Delta_costheta < np.cos(13*np.pi/180))
-        asy = ((pep[:,0] < 0.03) & (pem[:,0] > 0.03)) | ((pem[:,0] < 0.03) & (pep[:,0] > 0.03))
+    elif cut == "invmass":
+        mee = Cfv.inv_mass(pep + pem, pep + pem)
+        ovl = Delta_costheta < np.cos(13 * np.pi / 180)
+        asy = ((pep[:, 0] < 0.03) & (pem[:, 0] > 0.03)) | ((pem[:, 0] < 0.03) & (pep[:, 0] > 0.03))
         OldCut = ovl | asy
         condition = (mee < fastmc.mee_cut_func(Evis)) * OldCut
     else:
         toy_logger.error(f"Could not identify pre-selection cuts for kind {kind}")
-    
-    return w*condition
 
-def apply_final_LEEselection(Evis, costheta, w, exp='miniboone'):
+    return w * condition
+
+
+def apply_final_LEEselection(Evis, costheta, w, exp="miniboone"):
     # Cuts
     in_energy_range = (Evis > fastmc.EVIS_MIN[exp]) & (Evis < fastmc.EVIS_MAX[exp])
     # there could be an angular cut, but miniboone's acceptance is assumed to be 4*pi
-    return w*in_energy_range
-        
+    return w * in_energy_range
+
+
 # def signal_events(pep, pem, cosdelta_ee, costheta_ep, costheta_em, w, threshold = 0.03, angle_max = 13.0, event_type = 'both', apply_invariant_mass_cut=False):
-#     """signal_events 
+#     """signal_events
 #         This takes the events and asks for them to be either overlapping or asymmetric
-        
+
 #     Parameters
 #     ----------
 #     pep : numpy.ndarray[ndim=2]
@@ -275,7 +277,7 @@ def apply_final_LEEselection(Evis, costheta, w, exp='miniboone'):
 #         costheta of the negative lepton
 #     w : numpy.ndarray[ndim=1]
 #         event weights
-    
+
 #     threshold : float, optional
 #          how low energy does Esubleading need to be for event to be asymmetric, by default 0.03
 #     angle_max : float, optional
@@ -331,10 +333,10 @@ def apply_final_LEEselection(Evis, costheta, w, exp='miniboone'):
 #     w_inv = w[inv_filter]
 #     w_tot = w.sum()
 
-#     eff_asym	= w_asym.sum()/w_tot	
-#     eff_ovl		= w_ovl.sum()/w_tot	
-#     eff_sep		= w_sep.sum()/w_tot	
-#     eff_inv		= w_inv.sum()/w_tot	
+#     eff_asym	= w_asym.sum()/w_tot
+#     eff_ovl		= w_ovl.sum()/w_tot
+#     eff_sep		= w_sep.sum()/w_tot
+#     eff_inv		= w_inv.sum()/w_tot
 
 #     if event_type=='overlapping':
 
@@ -370,7 +372,7 @@ def apply_final_LEEselection(Evis, costheta, w, exp='miniboone'):
 
 #         Evis = np.full_like(Eep, None)
 #         theta_beam = np.full_like(Eep, None)
-        
+
 #         # visible energy
 #         Evis[both_filter] = (Eep*asym_p_filter + Eem*asym_m_filter + (Eep+Eem)*ovl_filter)[both_filter]
 #         # angle to the beam
@@ -397,7 +399,7 @@ def apply_final_LEEselection(Evis, costheta, w, exp='miniboone'):
 #         theta_ee[sep_filter] = theta_ee[sep_filter]
 
 #         return Eplus, Eminus, theta_beam_plus, theta_beam_minus, theta_ee, w_sep, eff_sep
-        
+
 #     elif event_type=='invisible':
 
 #         Eplus = np.full_like(Eep, None)
@@ -419,4 +421,3 @@ def apply_final_LEEselection(Evis, costheta, w, exp='miniboone'):
 #     else:
 #         print(f"Error! Could not find event type {event_type}.")
 #         return
-
