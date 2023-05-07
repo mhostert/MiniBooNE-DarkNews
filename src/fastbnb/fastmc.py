@@ -61,7 +61,7 @@ def get_r_cut_func(cut="circ1", extrapolate=True):
     function
         interpolatation of the r cut function as a function of Evis.
     """
-    cut_data = np.genfromtxt(open_text("ToyBNB.include.pi0_tools", "pi0_circle_cuts.dat"), unpack=True)
+    cut_data = np.genfromtxt(open_text("fastbnb.include.pi0_tools", "pi0_circle_cuts.dat"), unpack=True)
 
     bin_l = cut_data[0]
     bin_r = cut_data[1]
@@ -72,7 +72,7 @@ def get_r_cut_func(cut="circ1", extrapolate=True):
     try:
         cut_data = all_cuts[cut]
     except KeyError:
-        print(f"Error: {cut} is not a valid cut kind. Options are 'circ0', 'circ1', and 'diag'. Defaulting to circ0.")
+        print(f"Error: No Rcut function for {cut} kind. Options are 'circ0', 'circ1', and 'diag'. Defaulting to circ0.")
         cut_data = all_cuts["circ0"]
 
     if extrapolate:

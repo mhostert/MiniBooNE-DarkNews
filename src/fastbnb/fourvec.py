@@ -2,7 +2,7 @@ import numpy as np
 
 from DarkNews import Cfourvec as Cfv
 
-from ToyBNB import toy_logger
+from fastbnb import toy_logger
 
 X = 0
 Y = 1

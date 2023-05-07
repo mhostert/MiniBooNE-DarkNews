@@ -13,9 +13,9 @@ from matplotlib import cm
 from DarkNews import const
 from DarkNews.GenLauncher import GenLauncher
 
-from ToyBNB import fit_functions as ff
-from ToyBNB import analysis as av2
-from ToyBNB import decayer as av
+from fastbnb import fit_functions as ff
+from fastbnb import analysis as av2
+from fastbnb import decayer as av
 
 # default values
 UD4_def = 1.0 / np.sqrt(2.0)

@@ -9,7 +9,7 @@ import logging
 toy_logger = logging.getLogger(__name__ + ".logger")
 
 # Analysis and plotting modules
-from ToyBNB import analysis
-from ToyBNB import decayer
-from ToyBNB import fastmc
-from ToyBNB import plot_tools
+from fastbnb import analysis
+from fastbnb import decayer
+from fastbnb import fastmc
+from fastbnb import plot_tools

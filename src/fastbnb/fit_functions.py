@@ -12,10 +12,10 @@ from matplotlib import ticker
 
 from DarkNews import const
 from DarkNews import NuclearTarget
-from ToyBNB import decayer as av
-from ToyBNB import analysis as a
-from ToyBNB import grid_fit
-from ToyBNB import plot_tools
+from fastbnb import decayer as av
+from fastbnb import analysis as a
+from fastbnb import grid_fit
+from fastbnb import plot_tools
 
 import importlib.resources as resources
 

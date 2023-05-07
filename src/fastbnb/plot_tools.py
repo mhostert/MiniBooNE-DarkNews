@@ -10,10 +10,10 @@ import matplotlib.patches as mpatches
 from DarkNews import const
 from DarkNews import plot_tools as pt
 
-from ToyBNB import analysis
-from ToyBNB import decayer
-from ToyBNB import fourvec as fv
-from ToyBNB import toy_logger
+from fastbnb import analysis
+from fastbnb import decayer
+from fastbnb import fourvec as fv
+from fastbnb import toy_logger
 
 import importlib.resources as resources
 

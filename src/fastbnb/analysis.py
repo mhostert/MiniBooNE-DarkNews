@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.interpolate import interp1d
 
-from ToyBNB import fastmc, toy_logger
+from fastbnb import fastmc, toy_logger
 
 from DarkNews import const
 from DarkNews import Cfourvec as Cfv
@@ -224,21 +224,18 @@ def apply_pre_selection(w, pep, pem, kind="nueCCQElike", cut="circ1"):
     Evis = pep[:, 0] + pem[:, 0]
     Delta_costheta = Cfv.get_cos_opening_angle(pem, pep)
 
-    # load the r cut function
-    func_r_cut = fastmc.get_r_cut_func(cut=cut)
-
     # apply pre-selection cuts
     if cut == "circ1":
         r = np.sqrt((1 - Delta_costheta) ** 2 / 4 + (1 - emax / Evis) ** 2)
-        condition = r < func_r_cut(Evis)
+        condition = r < fastmc.get_r_cut_func(cut=cut)(Evis)
 
     elif cut == "circ0":
         r = np.sqrt((1 + Delta_costheta) ** 2 / 4 + (emax / Evis) ** 2)
-        condition = r > func_r_cut(Evis)
+        condition = r > fastmc.get_r_cut_func(cut=cut)(Evis)
 
     elif cut == "diag":
         r = 1 - 1 / 2 * ((1 + Delta_costheta) / 2 + emax / Evis)
-        condition = r < func_r_cut(Evis)
+        condition = r < fastmc.get_r_cut_func(cut=cut)(Evis)
 
     elif cut == "invmass":
         mee = Cfv.inv_mass(pep + pem, pep + pem)
