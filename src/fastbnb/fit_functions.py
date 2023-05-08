@@ -12,8 +12,8 @@ from matplotlib import ticker
 
 from DarkNews import const
 from DarkNews import NuclearTarget
-from fastbnb import decayer as av
-from fastbnb import analysis as a
+from fastbnb import decayer
+from fastbnb import analysis
 from fastbnb import grid_fit
 from fastbnb import plot_tools
 
@@ -51,7 +51,7 @@ plotvars = {"3+1": ["mzprime", "m4"], "3+2": ["m5", "delta"]}
 plotaxes = {"3+1": [r"$m_{Z\prime} [\mathrm{GeV}]$", r"$m_{4} [\mathrm{GeV}]$"], "3+2": [r"$m_{5} [\mathrm{GeV}]$", r"$\Delta$"]}
 
 # Location
-# loc = 'ToyAnalysis/data'
+# loc = 'fastbnb/data'
 loc = "data"
 # obtain data from MB for the fitting
 data_MB_source = {"Enu": grid_fit.get_data_MB(varplot="reco_Enu"), "angle": grid_fit.get_data_MB(varplot="reco_angle")}
@@ -125,6 +125,21 @@ def chi2_binned_rate(NP_MC, NPevents, back_MC, D, sys=[0.1, 0.1]):
 
 
 def chi2_MiniBooNE_2020(NP_MC, NPevents):
+    """chi2_MiniBooNE_2020 Get MiniBOoNE chi2 from data release in 2020
+
+    Parameters
+    ----------
+    NP_MC : np.array
+        Monte Carlo prediction for the signal rate from DarkNews -- shape of the histrogram.
+    NPevents : _type_
+        Total number of signal events to normalize the NP_MC prediction.
+
+    Returns
+    -------
+    _type_
+        np.float
+    """
+
     # shape of new physics prediction normalized to NPevents
     if np.sum(NP_MC) != 0:
         NP_MC = (NP_MC / np.sum(NP_MC)) * NPevents
@@ -132,18 +147,18 @@ def chi2_MiniBooNE_2020(NP_MC, NPevents):
     ####
     # using __init__ path definition
     # bin_e = np.genfromtxt(f'{PATH_TO_DATA_RELEASE}//miniboone_binboundaries_nue_lowe.txt')
-    bin_e = np.genfromtxt(resources.open_text("ToyAnalysis.include.MB_data_release.numode", "miniboone_binboundaries_nue_lowe.txt"))
+    bin_e = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_binboundaries_nue_lowe.txt"))
 
     bin_w = -bin_e[:-1] + bin_e[1:]
     bin_c = bin_e[:-1] + bin_w / 2
 
-    nue_data = np.genfromtxt(resources.open_text("ToyAnalysis.include.MB_data_release.numode", "miniboone_nuedata_lowe.txt"))
-    numu_data = np.genfromtxt(resources.open_text("ToyAnalysis.include.MB_data_release.numode", "miniboone_numudata.txt"))
+    nue_data = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_nuedata_lowe.txt"))
+    numu_data = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_numudata.txt"))
 
-    nue_bkg = np.genfromtxt(resources.open_text("ToyAnalysis.include.MB_data_release.numode", "miniboone_nuebgr_lowe.txt"))
-    numu_bkg = np.genfromtxt(resources.open_text("ToyAnalysis.include.MB_data_release.numode", "miniboone_numu.txt"))
+    nue_bkg = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_nuebgr_lowe.txt"))
+    numu_bkg = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_numu.txt"))
 
-    fract_covariance = np.genfromtxt(resources.open_text("ToyAnalysis.include.MB_data_release.numode", "miniboone_full_fractcovmatrix_nu_lowe.txt"))
+    fract_covariance = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_full_fractcovmatrix_nu_lowe.txt"))
 
     MB_LEE = nue_data - nue_bkg
 
@@ -197,16 +212,16 @@ def chi2_MiniBooNE_2020(NP_MC, NPevents):
 def cov_matrix_MB():
     # shape of new physics prediction normalized to NPevents
     # using __init__ path definition
-    bin_e = np.genfromtxt(resources.open_text("ToyAnalysis.include.MB_data_release.numode", "miniboone_binboundaries_nue_lowe.txt"))
+    bin_e = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_binboundaries_nue_lowe.txt"))
     bin_w = -bin_e[:-1] + bin_e[1:]
 
-    nue_data = np.genfromtxt(resources.open_text("ToyAnalysis.include.MB_data_release.numode", "miniboone_nuedata_lowe.txt"))
-    numu_data = np.genfromtxt(resources.open_text("ToyAnalysis.include.MB_data_release.numode", "miniboone_numudata.txt"))
+    nue_data = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_nuedata_lowe.txt"))
+    numu_data = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_numudata.txt"))
 
-    nue_bkg = np.genfromtxt(resources.open_text("ToyAnalysis.include.MB_data_release.numode", "miniboone_nuebgr_lowe.txt"))
-    numu_bkg = np.genfromtxt(resources.open_text("ToyAnalysis.include.MB_data_release.numode", "miniboone_numu.txt"))
+    nue_bkg = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_nuebgr_lowe.txt"))
+    numu_bkg = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_numu.txt"))
 
-    fract_covariance = np.genfromtxt(resources.open_text("ToyAnalysis.include.MB_data_release.numode", "miniboone_full_fractcovmatrix_nu_lowe.txt"))
+    fract_covariance = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_full_fractcovmatrix_nu_lowe.txt"))
 
     NP_diag_matrix = np.diag(np.concatenate([nue_data - nue_bkg, nue_bkg * 0.0, numu_bkg * 0.0]))
     tot_diag_matrix = np.diag(np.concatenate([nue_data - nue_bkg, nue_bkg, numu_bkg]))
@@ -323,7 +338,40 @@ def chi2_binned_rate_3p2(df, couplings, coupling_factor, back_MC, D, sys=[0.1, 0
     return chi2bin(res.x) if (l_decay < decay_limit) else (chi2bin(res.x) + l_decay**1.5)
 
 
-def chi2_MiniBooNE_2020_3p1(df, umu4, on_shell=True, v4i_f=v4i_f, v4i_def=v4i_def, vmu4_f=vmu4_f, vmu4_def=vmu4_def, r_eps=r_eps, l_decay_proper_cm=1):
+def chi2_MiniBooNE_2020_3p1(
+    df, umu4, cut="circ1", on_shell=True, v4i_f=v4i_f, v4i_def=v4i_def, vmu4_f=vmu4_f, vmu4_def=vmu4_def, r_eps=r_eps, l_decay_proper_cm=1
+):
+    """chi2_MiniBooNE_2020_3p1 This compute MiniBooNE chi2 from raw DarkNews dataframes -- straight from generation.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        _description_
+    umu4 : _type_
+        _description_
+    cut : str, optional
+        _description_, by default "circ1"
+    on_shell : bool, optional
+        _description_, by default True
+    v4i_f : _type_, optional
+        _description_, by default v4i_f
+    v4i_def : _type_, optional
+        _description_, by default v4i_def
+    vmu4_f : _type_, optional
+        _description_, by default vmu4_f
+    vmu4_def : _type_, optional
+        _description_, by default vmu4_def
+    r_eps : _type_, optional
+        _description_, by default r_eps
+    l_decay_proper_cm : int, optional
+        _description_, by default 1
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
+
     df = df.copy(deep=True)
 
     if on_shell:
@@ -332,8 +380,12 @@ def chi2_MiniBooNE_2020_3p1(df, umu4, on_shell=True, v4i_f=v4i_f, v4i_def=v4i_de
         factor = (r_eps * v4i_f(umu4) / v4i_def) ** 2
 
     decay_l = l_decay_proper_cm / factor
-    df_decay = av.decay_selection(df, decay_l, "miniboone", weights="w_event_rate")
-    df_decay = a.compute_spectrum(df_decay, EVENT_TYPE="both")
+    df_decay = decayer.decay_selection(df, l_decay_proper_cm=decay_l, experiment="miniboone", weights="w_event_rate")
+    df_decay = analysis.reco_nueCCQElike_Enu(df_decay, cut=cut)
+
+    # Jaime's initial code
+    # df_decay = av.decay_selection(df, decay_l, "miniboone", weights="w_event_rate")
+    # df_decay = a.compute_spectrum(df_decay, EVENT_TYPE="both")
 
     df_decay = df_decay[df_decay.reco_w > 0]
     sum_w_post_smearing = np.abs(np.sum(df_decay["reco_w"]))
@@ -345,6 +397,24 @@ def chi2_MiniBooNE_2020_3p1(df, umu4, on_shell=True, v4i_f=v4i_f, v4i_def=v4i_de
 
 
 def chi2_MiniBooNE_2020_3p2(df, vmu5, vmu5_def=vmu5_def, r_eps=1.0):
+    """chi2_MiniBooNE_2020_3p2 This compute MiniBooNE chi2 from processed DarkNews dataframes -- i.e., needs to be decayer.decay_selection and analysis.reco_nueCCQElike_Enu.
+
+    Parameters
+    ----------
+    df : _type_
+        _description_
+    vmu5 : _type_
+        _description_
+    vmu5_def : _type_, optional
+        _description_, by default vmu5_def
+    r_eps : float, optional
+        _description_, by default 1.0
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     df_decay = df.copy(deep=True)
 
     sum_w_post_smearing = np.abs(np.sum(df_decay["reco_w"])) * r_eps**2
@@ -364,17 +434,17 @@ def chi2_MiniBooNE_2020_3p2_nodecay(NP_MC, NPevents):
 
     ####
     # using __init__ path definition
-    bin_e = np.genfromtxt(resources.open_text("ToyAnalysis.include.MB_data_release.numode", "miniboone_binboundaries_nue_lowe.txt"))
+    bin_e = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_binboundaries_nue_lowe.txt"))
     bin_w = -bin_e[:-1] + bin_e[1:]
     bin_c = bin_e[:-1] + bin_w / 2
 
-    nue_data = np.genfromtxt(resources.open_text("ToyAnalysis.include.MB_data_release.numode", "miniboone_nuedata_lowe.txt"))
-    numu_data = np.genfromtxt(resources.open_text("ToyAnalysis.include.MB_data_release.numode", "miniboone_numudata.txt"))
+    nue_data = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_nuedata_lowe.txt"))
+    numu_data = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_numudata.txt"))
 
-    nue_bkg = np.genfromtxt(resources.open_text("ToyAnalysis.include.MB_data_release.numode", "miniboone_nuebgr_lowe.txt"))
-    numu_bkg = np.genfromtxt(resources.open_text("ToyAnalysis.include.MB_data_release.numode", "miniboone_numu.txt"))
+    nue_bkg = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_nuebgr_lowe.txt"))
+    numu_bkg = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_numu.txt"))
 
-    fract_covariance = np.genfromtxt(resources.open_text("ToyAnalysis.include.MB_data_release.numode", "miniboone_full_fractcovmatrix_nu_lowe.txt"))
+    fract_covariance = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_full_fractcovmatrix_nu_lowe.txt"))
 
     MB_LEE = nue_data - nue_bkg
 

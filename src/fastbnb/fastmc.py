@@ -43,7 +43,7 @@ def mee_cut_func(Evis):
     return 0.03203 + 0.007417 * (Evis) + 0.02738 * (Evis) ** 2
 
 
-def get_r_cut_func(cut="circ1", extrapolate=True):
+def get_r_cut_func(cut="circ1", extrapolate=True, uncertainty_case="1cut100samples"):
     """get_r_cut_func get interpolation of the r cut from
             Kelly and Kopp (2022) -- https://arxiv.org/abs/2210.08021
 
@@ -66,14 +66,24 @@ def get_r_cut_func(cut="circ1", extrapolate=True):
     bin_l = cut_data[0]
     bin_r = cut_data[1]
     bin_c = bin_l + (bin_r - bin_l) / 2.0
+    access_indices = {"diag": 2, "circ0": 6, "circ1": 4}
 
-    all_cuts = {"circ0": cut_data[6], "circ1": cut_data[4], "diag": cut_data[2]}
+    access_index = access_indices[cut]
+    if uncertainty_case == "100cut1sample":
+        access_index += 1
+    elif uncertainty_case == "1cut100samples":
+        pass
+    else:
+        print(f"Error: No uncertainty case {uncertainty_case}. Options are '100cut1sample' and '1cut100samples'. Defaulting to 1cut100samples.")
+        pass
+
+    cuts = cut_data[access_index]
 
     try:
-        cut_data = all_cuts[cut]
+        cut_data = cuts
     except KeyError:
         print(f"Error: No Rcut function for {cut} kind. Options are 'circ0', 'circ1', and 'diag'. Defaulting to circ0.")
-        cut_data = all_cuts["circ0"]
+        cut_data = cut_data[4]
 
     if extrapolate:
         return interp1d(bin_c, cut_data, kind="linear", fill_value=(cut_data[0], cut_data[-1]), bounds_error=False)
