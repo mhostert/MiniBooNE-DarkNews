@@ -26,9 +26,19 @@ ANALYSIS_TH = {"miniboone": 0.02, "microboone": None}
 
 def reco_EnuCCQE(Evis, costheta):
     # this assumes quasi-elastic scattering to mimmick MiniBooNE's assumption that the underlying events are nueCC.
-    num = const.m_neutron * Evis - (const.m_neutron**2 + const.m_e**2 - const.m_proton**2) / 2
-    den = const.m_neutron - Evis + np.sqrt(Evis**2 - const.m_e) * costheta
-    return num / den
+    num = (
+        const.m_neutron * Evis
+        - (const.m_neutron**2 + const.m_e**2 - const.m_proton**2) / 2
+    )
+    physical = Evis**2 - const.m_e**2 > 0
+    den = np.full(len(Evis), np.nan)
+    den[physical] = (
+        const.m_neutron
+        - Evis[physical]
+        + np.sqrt(Evis[physical] ** 2 - const.m_e**2) * costheta[physical]
+    )
+    Enu = num / den
+    return Enu
 
 
 def mee_cut_func(Evis):
@@ -61,7 +71,9 @@ def get_r_cut_func(cut="circ1", extrapolate=True, uncertainty_case="1cut100sampl
     function
         interpolatation of the r cut function as a function of Evis.
     """
-    cut_data = np.genfromtxt(open_text("fastbnb.include.pi0_tools", "pi0_circle_cuts.dat"), unpack=True)
+    cut_data = np.genfromtxt(
+        open_text("fastbnb.include.pi0_tools", "pi0_circle_cuts.dat"), unpack=True
+    )
 
     bin_l = cut_data[0]
     bin_r = cut_data[1]
@@ -74,7 +86,9 @@ def get_r_cut_func(cut="circ1", extrapolate=True, uncertainty_case="1cut100sampl
     elif uncertainty_case == "1cut100samples":
         pass
     else:
-        print(f"Error: No uncertainty case {uncertainty_case}. Options are '100cut1sample' and '1cut100samples'. Defaulting to 1cut100samples.")
+        print(
+            f"Error: No uncertainty case {uncertainty_case}. Options are '100cut1sample' and '1cut100samples'. Defaulting to 1cut100samples."
+        )
         pass
 
     cuts = cut_data[access_index]
@@ -82,13 +96,23 @@ def get_r_cut_func(cut="circ1", extrapolate=True, uncertainty_case="1cut100sampl
     try:
         cut_data = cuts
     except KeyError:
-        print(f"Error: No Rcut function for {cut} kind. Options are 'circ0', 'circ1', and 'diag'. Defaulting to circ0.")
+        print(
+            f"Error: No Rcut function for {cut} kind. Options are 'circ0', 'circ1', and 'diag'. Defaulting to circ0."
+        )
         cut_data = cut_data[4]
 
     if extrapolate:
-        return interp1d(bin_c, cut_data, kind="linear", fill_value=(cut_data[0], cut_data[-1]), bounds_error=False)
+        return interp1d(
+            bin_c,
+            cut_data,
+            kind="linear",
+            fill_value=(cut_data[0], cut_data[-1]),
+            bounds_error=False,
+        )
     else:
-        return interp1d(bin_c, cut_data, kind="linear", fill_value=None, bounds_error=False)
+        return interp1d(
+            bin_c, cut_data, kind="linear", fill_value=None, bounds_error=False
+        )
 
 
 def efficiency(samples, weights, xmin, xmax):
@@ -174,7 +198,11 @@ def smear_samples(samples, mass=const.m_e, exp="miniboone"):
         # apply exponentially modified gaussian with exponential rate lambda = 1/K = 1 --> K=1
         K = 1
         T = exponnorm.rvs(K, loc=T, scale=sigma_E)
-        ctheta = np.cos(exponnorm.rvs(K, loc=np.arccos(ctheta), scale=sigma_angle * np.ones(nentries)))
+        ctheta = np.cos(
+            exponnorm.rvs(
+                K, loc=np.arccos(ctheta), scale=sigma_angle * np.ones(nentries)
+            )
+        )
 
     # Unfortunately, a Gaussian energy smearing can give non-physical results.
     T[T < 0] = 0  # force smearing to be positive for T
@@ -184,6 +212,8 @@ def smear_samples(samples, mass=const.m_e, exp="miniboone"):
     stheta = np.sqrt(1 - ctheta**2)
 
     # put data in an array and then in a DataFrame
-    smeared = np.array([E, P * stheta * np.cos(phi), P * stheta * np.sin(phi), P * ctheta]).T
+    smeared = np.array(
+        [E, P * stheta * np.cos(phi), P * stheta * np.sin(phi), P * ctheta]
+    ).T
 
     return smeared

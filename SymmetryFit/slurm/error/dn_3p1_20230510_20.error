@@ -1,0 +1,27 @@
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+slurmstepd: error: *** STEP 441877.29 ON cn006 CANCELLED AT 2023-05-11T00:31:30 DUE TO TIME LIMIT ***
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+slurmstepd: error: *** JOB 441877 ON cn006 CANCELLED AT 2023-05-11T00:31:30 DUE TO TIME LIMIT ***
+slurmstepd: error: *** STEP 441877.0 ON cn006 CANCELLED AT 2023-05-11T00:31:30 DUE TO TIME LIMIT ***
+slurmstepd: error: *** STEP 441877.25 ON cn006 CANCELLED AT 2023-05-11T00:31:30 DUE TO TIME LIMIT ***
+slurmstepd: error: *** STEP 441877.6 ON cn006 CANCELLED AT 2023-05-11T00:31:30 DUE TO TIME LIMIT ***
+slurmstepd: error: *** STEP 441877.8 ON cn006 CANCELLED AT 2023-05-11T00:31:30 DUE TO TIME LIMIT ***
+slurmstepd: error: *** STEP 441877.9 ON cn006 CANCELLED AT 2023-05-11T00:31:30 DUE TO TIME LIMIT ***
+slurmstepd: error: *** STEP 441877.22 ON cn006 CANCELLED AT 2023-05-11T00:31:30 DUE TO TIME LIMIT ***
+slurmstepd: error: *** STEP 441877.20 ON cn006 CANCELLED AT 2023-05-11T00:31:30 DUE TO TIME LIMIT ***
+slurmstepd: error: *** STEP 441877.17 ON cn006 CANCELLED AT 2023-05-11T00:31:30 DUE TO TIME LIMIT ***
+slurmstepd: error: *** STEP 441877.12 ON cn006 CANCELLED AT 2023-05-11T00:31:30 DUE TO TIME LIMIT ***
+slurmstepd: error: *** STEP 441877.19 ON cn006 CANCELLED AT 2023-05-11T00:31:30 DUE TO TIME LIMIT ***
+slurmstepd: error: *** STEP 441877.18 ON cn006 CANCELLED AT 2023-05-11T00:31:30 DUE TO TIME LIMIT ***
+slurmstepd: error: *** STEP 441877.39 ON cn006 CANCELLED AT 2023-05-11T00:31:30 DUE TO TIME LIMIT ***

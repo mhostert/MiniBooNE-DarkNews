@@ -9,20 +9,89 @@ from DarkNews import Cfourvec as Cfv
 
 def miniboone_reco_eff_func():
     # Single photon efficiencies from data release
-    eff = np.array([0.0, 0.089, 0.135, 0.139, 0.131, 0.123, 0.116, 0.106, 0.102, 0.095, 0.089, 0.082, 0.073, 0.067, 0.052, 0.026])
-    enu = np.array([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1])
+    eff = np.array(
+        [
+            0.0,
+            0.089,
+            0.135,
+            0.139,
+            0.131,
+            0.123,
+            0.116,
+            0.106,
+            0.102,
+            0.095,
+            0.089,
+            0.082,
+            0.073,
+            0.067,
+            0.052,
+            0.026,
+        ]
+    )
+    enu = np.array(
+        [
+            0.0,
+            0.1,
+            0.2,
+            0.3,
+            0.4,
+            0.5,
+            0.6,
+            0.7,
+            0.8,
+            0.9,
+            1.0,
+            1.1,
+            1.3,
+            1.5,
+            1.7,
+            1.9,
+            2.1,
+        ]
+    )
     enu_c = enu[:-1] + (enu[1:] - enu[:-1]) / 2
-    return interp1d(enu_c, eff, fill_value=(eff[0], eff[-1]), bounds_error=False, kind="nearest")
+    return interp1d(
+        enu_c, eff, fill_value=(eff[0], eff[-1]), bounds_error=False, kind="nearest"
+    )
 
 
 # NOTE: This function is not used in the paper.
 def microboone_reco_eff_func():
     # Total nueCCQE efficiency -- NuMI flux averaged xsec paper.
-    E_numi_eff_edge = np.array([0, 2.97415218e-1, 4.70796471e-1, 7.01196105e-1, 9.88922361e-1, 1.43183725e0, 3.00810009e0, 6.00428361e0])
-    nueCCQE_numi_eff_edge = np.array([6.13255034e-2, 1.44127517e-1, 2.12332215e-1, 2.64681208e-1, 2.76761745e-1, 2.97902685e-1, 2.57885906e-1, 2.60151007e-1])
+    E_numi_eff_edge = np.array(
+        [
+            0,
+            2.97415218e-1,
+            4.70796471e-1,
+            7.01196105e-1,
+            9.88922361e-1,
+            1.43183725e0,
+            3.00810009e0,
+            6.00428361e0,
+        ]
+    )
+    nueCCQE_numi_eff_edge = np.array(
+        [
+            6.13255034e-2,
+            1.44127517e-1,
+            2.12332215e-1,
+            2.64681208e-1,
+            2.76761745e-1,
+            2.97902685e-1,
+            2.57885906e-1,
+            2.60151007e-1,
+        ]
+    )
     E_numi_eff = (E_numi_eff_edge[1:] - E_numi_eff_edge[:-1]) / 2 + E_numi_eff_edge[:-1]
     nueCCQE_numi_eff = nueCCQE_numi_eff_edge[:-1]
-    return interp1d(E_numi_eff, nueCCQE_numi_eff, fill_value=(nueCCQE_numi_eff[0], nueCCQE_numi_eff[-1]), bounds_error=False, kind="nearest")
+    return interp1d(
+        E_numi_eff,
+        nueCCQE_numi_eff,
+        fill_value=(nueCCQE_numi_eff[0], nueCCQE_numi_eff[-1]),
+        bounds_error=False,
+        kind="nearest",
+    )
 
 
 def apply_reco_efficiencies(Energy, w, exp="miniboone"):
@@ -120,7 +189,9 @@ def reco_nueCCQElike_Enu(df, exp="miniboone", cut="circ1"):
         # Evis, theta_beam, w, eff_s = signal_events(pep, pem, Delta_costheta, costhetaep, costhetaem, w, threshold=ep.THRESHOLD[exp], angle_max=ep.ANGLE_MAX[exp], event_type=event_type)
         w_preselection = apply_pre_selection(w, pep, pem, kind="nueCCQElike", cut=cut)
     else:
-        toy_logger.error(f"Could not find pre-selection for the events in DataFrame columns: {df.columns}")
+        toy_logger.error(
+            f"Could not find pre-selection for the events in DataFrame columns: {df.columns}"
+        )
 
     # Applies analysis cuts on the surviving LEE candidate events
     w_selection = apply_final_LEEselection(Evis, costheta, w_preselection, exp=exp)
@@ -143,7 +214,7 @@ def reco_nueCCQElike_Enu(df, exp="miniboone", cut="circ1"):
 
 
 # Full analysis to get reconstructed energy spectrum for BNB experiments
-def reco_pi0like_invmass(df, exp="miniboone", cuts="circ1"):
+def reco_pi0like_invmass(df, exp="miniboone", cut="circ1"):
     """compute_spectrum _summary_
 
     Parameters
@@ -152,8 +223,8 @@ def reco_pi0like_invmass(df, exp="miniboone", cuts="circ1"):
         DarkNews events (preferrably after selecting events inside detector)
     exp : str, optional
         what experiment to use, by default 'miniboone' but can also be 'microboone'
-    cuts : str, optional
-        what kind of "mis-identificatin" cuts pre-selection to be used:
+    cut : str, optional
+        what kind of "mis-identificatin" cut pre-selection to be used:
             for photons:
                 'photon' assumes this is a photon and therefore always a single shower
             for lepton or photon pairs:
@@ -180,9 +251,10 @@ def reco_pi0like_invmass(df, exp="miniboone", cuts="circ1"):
         Evis = pep[:, 0] + pem[:, 0]
 
         # Evis, theta_beam, w, eff_s = signal_events(pep, pem, Delta_costheta, costhetaep, costhetaem, w, threshold=ep.THRESHOLD[exp], angle_max=ep.ANGLE_MAX[exp], event_type=event_type)
-        w_preselection = apply_pre_selection(w, pep, pem, kind="pi0like", cuts=cuts)
+        w_preselection = apply_pre_selection(w, pep, pem, kind="pi0like", cut=cut)
 
-    w_selection = apply_reco_efficiencies(Evis, w_preselection, exp=exp)
+    # No efficiency in this case?
+    w_selection = w_preselection
 
     ############################################################################
     # return reco observables of LEE
@@ -240,13 +312,21 @@ def apply_pre_selection(w, pep, pem, kind="nueCCQElike", cut="circ1"):
     elif cut == "invmass":
         mee = Cfv.inv_mass(pep + pem, pep + pem)
         ovl = Delta_costheta < np.cos(13 * np.pi / 180)
-        asy = ((pep[:, 0] < 0.03) & (pem[:, 0] > 0.03)) | ((pem[:, 0] < 0.03) & (pep[:, 0] > 0.03))
+        asy = ((pep[:, 0] < 0.03) & (pem[:, 0] > 0.03)) | (
+            (pem[:, 0] < 0.03) & (pep[:, 0] > 0.03)
+        )
         OldCut = ovl | asy
         condition = (mee < fastmc.mee_cut_func(Evis)) * OldCut
     else:
         toy_logger.error(f"Could not identify pre-selection cuts for kind {kind}")
 
-    return w * condition
+    if kind == "nueCCQElike":
+        return w * condition
+    elif kind == "pi0like":
+        return w * (~condition)
+    else:
+        toy_logger.error(f"Could not identify pre-selection cuts for kind {kind}")
+        raise ValueError(f"Could not identify pre-selection cuts for kind {kind}")
 
 
 def apply_final_LEEselection(Evis, costheta, w, exp="miniboone"):

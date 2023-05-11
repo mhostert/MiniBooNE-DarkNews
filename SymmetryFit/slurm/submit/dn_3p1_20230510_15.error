@@ -1,0 +1,3 @@
+sbatch: error: Batch job submission failed: Socket timed out on send/recv operation
+/cm/local/apps/slurm/var/spool/job441848/slurm_script: line 10: jid0: bad array subscript
+sbatch: error: Batch job submission failed: Job dependency problem

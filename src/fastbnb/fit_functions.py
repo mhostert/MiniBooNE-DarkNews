@@ -17,7 +17,7 @@ from fastbnb import analysis
 from fastbnb import grid_fit
 from fastbnb import plot_tools
 
-import importlib.resources as resources
+from importlib.resources import open_text
 
 # targets
 proton = NuclearTarget("H1")
@@ -32,7 +32,12 @@ umu4_def = np.sqrt(1.0e-12)
 umu5_def = np.sqrt(1.0e-12)
 epsilon_def = 1e-4
 
-vmu5_def = gD_def * ud5_def * (umu4_def * ud4_def + umu5_def * ud5_def) / np.sqrt(1 - umu4_def**2 - umu5_def**2)
+vmu5_def = (
+    gD_def
+    * ud5_def
+    * (umu4_def * ud4_def + umu5_def * ud5_def)
+    / np.sqrt(1 - umu4_def**2 - umu5_def**2)
+)
 v4i_def = gD_def * ud4_def * umu4_def
 vmu4_def = gD_def * ud4_def * ud4_def * umu4_def / np.sqrt(1 - umu4_def**2)
 
@@ -44,17 +49,37 @@ epsilon = 1e-4
 r_eps = epsilon / epsilon_def
 
 # bins for fast histogram preparation
-bin_e_def = np.array([0.2, 0.3, 0.375, 0.475, 0.55, 0.675, 0.8, 0.95, 1.1, 1.3, 1.5, 3.0])
+bin_e_def = np.array(
+    [0.2, 0.3, 0.375, 0.475, 0.55, 0.675, 0.8, 0.95, 1.1, 1.3, 1.5, 3.0]
+)
+bin_enu_def = np.genfromtxt(
+    open_text("fastbnb.include.miniboone_2020", "Enu_bin_edges.dat")
+)
+bin_costheta_def = np.genfromtxt(
+    open_text("fastbnb.include.miniboone_2020", "Costheta_bin_edges.dat")
+)
+bin_evis_def = np.genfromtxt(
+    open_text("fastbnb.include.miniboone_2020", "Evis_bin_edges.dat")
+)
+bin_invmass_def = np.genfromtxt(
+    open_text("fastbnb.include.pi0_tools", "Invmass_bin_edges.dat")
+)
 
 # data for plots
 plotvars = {"3+1": ["mzprime", "m4"], "3+2": ["m5", "delta"]}
-plotaxes = {"3+1": [r"$m_{Z\prime} [\mathrm{GeV}]$", r"$m_{4} [\mathrm{GeV}]$"], "3+2": [r"$m_{5} [\mathrm{GeV}]$", r"$\Delta$"]}
+plotaxes = {
+    "3+1": [r"$m_{Z\prime} [\mathrm{GeV}]$", r"$m_{4} [\mathrm{GeV}]$"],
+    "3+2": [r"$m_{5} [\mathrm{GeV}]$", r"$\Delta$"],
+}
 
 # Location
 # loc = 'fastbnb/data'
 loc = "data"
 # obtain data from MB for the fitting
-data_MB_source = {"Enu": grid_fit.get_data_MB(varplot="reco_Enu"), "angle": grid_fit.get_data_MB(varplot="reco_angle")}
+data_MB_source = {
+    "Enu": grid_fit.get_data_MB(varplot="reco_Enu"),
+    "angle": grid_fit.get_data_MB(varplot="reco_angle"),
+}
 
 # Normalization (temporal variable)
 NORMALIZATION = 1
@@ -74,10 +99,12 @@ def round_sig(x, sig=1):
 def get_decay_length(df, coupling_factor=1.0):
     # get momenta and decay length for decay_N
     pN = df.P_decay_N_parent.values
-    l_decay_proper_cm = const.get_decay_rate_in_cm(np.sum(df.w_decay_rate_0)) / coupling_factor**2
+    l_decay_proper_cm = (
+        const.get_decay_rate_in_cm(np.sum(df.w_decay_rate_0)) / coupling_factor**2
+    )
 
     # compute the position of decay
-    x, y, z = av.decay_position(pN, l_decay_proper_cm)[1:]
+    x, y, z = decayer.decay_position(pN, l_decay_proper_cm)[1:]
 
     return np.sqrt(x * x + y * y + z * z).mean()
 
@@ -115,7 +142,11 @@ def chi2_binned_rate(NP_MC, NPevents, back_MC, D, sys=[0.1, 0.1]):
 
         mu = NP_MC * (1 + alpha) + back_MC * (1 + beta)
 
-        return 2 * np.sum(mu - D + safe_log(D, mu)) + np.sum(alpha**2 / (err_flux**2)) + np.sum(beta**2 / (err_back**2))
+        return (
+            2 * np.sum(mu - D + safe_log(D, mu))
+            + np.sum(alpha**2 / (err_flux**2))
+            + np.sum(beta**2 / (err_back**2))
+        )
 
     cons = {"type": "ineq", "fun": lambda x: x}
 
@@ -136,8 +167,8 @@ def chi2_MiniBooNE_2020(NP_MC, NPevents):
 
     Returns
     -------
-    _type_
-        np.float
+    np.float
+        the MiniBooNE chi2 value (non-zero)
     """
 
     # shape of new physics prediction normalized to NPevents
@@ -147,25 +178,47 @@ def chi2_MiniBooNE_2020(NP_MC, NPevents):
     ####
     # using __init__ path definition
     # bin_e = np.genfromtxt(f'{PATH_TO_DATA_RELEASE}//miniboone_binboundaries_nue_lowe.txt')
-    bin_e = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_binboundaries_nue_lowe.txt"))
+    bin_e = np.genfromtxt(
+        open_text(
+            "fastbnb.include.MB_data_release.numode",
+            "miniboone_binboundaries_nue_lowe.txt",
+        )
+    )
 
     bin_w = -bin_e[:-1] + bin_e[1:]
     bin_c = bin_e[:-1] + bin_w / 2
 
-    nue_data = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_nuedata_lowe.txt"))
-    numu_data = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_numudata.txt"))
+    nue_data = np.genfromtxt(
+        open_text(
+            "fastbnb.include.MB_data_release.numode", "miniboone_nuedata_lowe.txt"
+        )
+    )
+    numu_data = np.genfromtxt(
+        open_text("fastbnb.include.MB_data_release.numode", "miniboone_numudata.txt")
+    )
 
-    nue_bkg = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_nuebgr_lowe.txt"))
-    numu_bkg = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_numu.txt"))
+    nue_bkg = np.genfromtxt(
+        open_text("fastbnb.include.MB_data_release.numode", "miniboone_nuebgr_lowe.txt")
+    )
+    numu_bkg = np.genfromtxt(
+        open_text("fastbnb.include.MB_data_release.numode", "miniboone_numu.txt")
+    )
 
-    fract_covariance = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_full_fractcovmatrix_nu_lowe.txt"))
+    fract_covariance = np.genfromtxt(
+        open_text(
+            "fastbnb.include.MB_data_release.numode",
+            "miniboone_full_fractcovmatrix_nu_lowe.txt",
+        )
+    )
 
     MB_LEE = nue_data - nue_bkg
 
     NP_diag_matrix = np.diag(np.concatenate([NP_MC, nue_bkg * 0.0, numu_bkg * 0.0]))
     tot_diag_matrix = np.diag(np.concatenate([NP_MC, nue_bkg, numu_bkg]))
 
-    rescaled_covariance = np.dot(tot_diag_matrix, np.dot(fract_covariance, tot_diag_matrix))
+    rescaled_covariance = np.dot(
+        tot_diag_matrix, np.dot(fract_covariance, tot_diag_matrix)
+    )
     rescaled_covariance += NP_diag_matrix  # this adds the statistical error on data
 
     # collapse background part of the covariance
@@ -183,20 +236,25 @@ def chi2_MiniBooNE_2020(NP_MC, NPevents):
     )
     error_matrix[n_signal : (n_signal + n_numu), 0:n_signal] = (
         rescaled_covariance[2 * n_signal : (2 * n_signal + n_numu), 0:n_signal]
-        + rescaled_covariance[2 * n_signal : (2 * n_signal + n_numu), n_signal : 2 * n_signal]
+        + rescaled_covariance[
+            2 * n_signal : (2 * n_signal + n_numu), n_signal : 2 * n_signal
+        ]
     )
     error_matrix[0:n_signal, n_signal : (n_signal + n_numu)] = (
         rescaled_covariance[0:n_signal, 2 * n_signal : (2 * n_signal + n_numu)]
-        + rescaled_covariance[n_signal : 2 * n_signal, 2 * n_signal : (2 * n_signal + n_numu)]
+        + rescaled_covariance[
+            n_signal : 2 * n_signal, 2 * n_signal : (2 * n_signal + n_numu)
+        ]
     )
-    error_matrix[n_signal : (n_signal + n_numu), n_signal : (n_signal + n_numu)] = rescaled_covariance[
+    error_matrix[
+        n_signal : (n_signal + n_numu), n_signal : (n_signal + n_numu)
+    ] = rescaled_covariance[
         2 * n_signal : 2 * n_signal + n_numu, 2 * n_signal : (2 * n_signal + n_numu)
     ]
 
     # assert(np.abs(np.sum(error_matrix) - np.sum(rescaled_covariance)) < 1.e-3)
-
-    if not (np.abs(np.sum(error_matrix) - np.sum(rescaled_covariance)) < 1.0e-3):
-        return -1
+    # if not (np.abs(np.sum(error_matrix) - np.sum(rescaled_covariance)) < 1.0e-3):
+    #     return -1
 
     # compute residuals
     residuals = np.concatenate([nue_data - (NP_MC + nue_bkg), (numu_data - numu_bkg)])
@@ -204,29 +262,58 @@ def chi2_MiniBooNE_2020(NP_MC, NPevents):
     inv_cov = np.linalg.inv(error_matrix)
 
     # calculate chi^2
-    chi2 = np.dot(residuals, np.dot(inv_cov, residuals))  # + np.log(np.linalg.det(error_matrix))
+    chi2 = np.dot(
+        residuals, np.dot(inv_cov, residuals)
+    )  # + np.log(np.linalg.det(error_matrix))
 
-    return chi2
+    if chi2 >= 0:
+        return chi2
+    else:
+        return 1e10
 
 
 def cov_matrix_MB():
     # shape of new physics prediction normalized to NPevents
     # using __init__ path definition
-    bin_e = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_binboundaries_nue_lowe.txt"))
+    bin_e = np.genfromtxt(
+        open_text(
+            "fastbnb.include.MB_data_release.numode",
+            "miniboone_binboundaries_nue_lowe.txt",
+        )
+    )
     bin_w = -bin_e[:-1] + bin_e[1:]
 
-    nue_data = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_nuedata_lowe.txt"))
-    numu_data = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_numudata.txt"))
+    nue_data = np.genfromtxt(
+        open_text(
+            "fastbnb.include.MB_data_release.numode", "miniboone_nuedata_lowe.txt"
+        )
+    )
+    numu_data = np.genfromtxt(
+        open_text("fastbnb.include.MB_data_release.numode", "miniboone_numudata.txt")
+    )
 
-    nue_bkg = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_nuebgr_lowe.txt"))
-    numu_bkg = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_numu.txt"))
+    nue_bkg = np.genfromtxt(
+        open_text("fastbnb.include.MB_data_release.numode", "miniboone_nuebgr_lowe.txt")
+    )
+    numu_bkg = np.genfromtxt(
+        open_text("fastbnb.include.MB_data_release.numode", "miniboone_numu.txt")
+    )
 
-    fract_covariance = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_full_fractcovmatrix_nu_lowe.txt"))
+    fract_covariance = np.genfromtxt(
+        open_text(
+            "fastbnb.include.MB_data_release.numode",
+            "miniboone_full_fractcovmatrix_nu_lowe.txt",
+        )
+    )
 
-    NP_diag_matrix = np.diag(np.concatenate([nue_data - nue_bkg, nue_bkg * 0.0, numu_bkg * 0.0]))
+    NP_diag_matrix = np.diag(
+        np.concatenate([nue_data - nue_bkg, nue_bkg * 0.0, numu_bkg * 0.0])
+    )
     tot_diag_matrix = np.diag(np.concatenate([nue_data - nue_bkg, nue_bkg, numu_bkg]))
 
-    rescaled_covariance = np.dot(tot_diag_matrix, np.dot(fract_covariance, tot_diag_matrix))
+    rescaled_covariance = np.dot(
+        tot_diag_matrix, np.dot(fract_covariance, tot_diag_matrix)
+    )
     rescaled_covariance += NP_diag_matrix  # this adds the statistical error on data
 
     # collapse background part of the covariance
@@ -244,13 +331,19 @@ def cov_matrix_MB():
     )
     error_matrix[n_signal : (n_signal + n_numu), 0:n_signal] = (
         rescaled_covariance[2 * n_signal : (2 * n_signal + n_numu), 0:n_signal]
-        + rescaled_covariance[2 * n_signal : (2 * n_signal + n_numu), n_signal : 2 * n_signal]
+        + rescaled_covariance[
+            2 * n_signal : (2 * n_signal + n_numu), n_signal : 2 * n_signal
+        ]
     )
     error_matrix[0:n_signal, n_signal : (n_signal + n_numu)] = (
         rescaled_covariance[0:n_signal, 2 * n_signal : (2 * n_signal + n_numu)]
-        + rescaled_covariance[n_signal : 2 * n_signal, 2 * n_signal : (2 * n_signal + n_numu)]
+        + rescaled_covariance[
+            n_signal : 2 * n_signal, 2 * n_signal : (2 * n_signal + n_numu)
+        ]
     )
-    error_matrix[n_signal : (n_signal + n_numu), n_signal : (n_signal + n_numu)] = rescaled_covariance[
+    error_matrix[
+        n_signal : (n_signal + n_numu), n_signal : (n_signal + n_numu)
+    ] = rescaled_covariance[
         2 * n_signal : 2 * n_signal + n_numu, 2 * n_signal : (2 * n_signal + n_numu)
     ]
 
@@ -264,82 +357,17 @@ def cov_matrix_MB():
     return error_matrix
 
 
-def chi2_binned_rate_3p1(df, couplings, coupling_factor, back_MC, D, sys=[0.1, 0.1], type_fit="angle", decay_limit=10000):
-    err_flux = sys[0]
-    err_back = sys[1]
-
-    df_decay = av.select_MB_decay_expo(df, coupling_factor=coupling_factor)
-    sum_w_post_smearing = np.abs(np.sum(df_decay["reco_w"]))
-    total_Nevent_MB = 400 * np.abs((1 / df_decay["reco_eff"][0]))
-    if type_fit == "angle":
-        histograms = plot_tools.get_histogram1D(df_decay, NEVENTS=total_Nevent_MB, varplot="reco_angle", loc="../")
-    else:
-        histograms = plot_tools.get_histogram1D(df_decay, NEVENTS=total_Nevent_MB, varplot="reco_Enu", loc="../")
-    NP_MC = histograms[0]
-    NPevents = ((couplings * epsilon * couplings / ud4_def) / couplings_default_3p1) ** 2 * sum_w_post_smearing
-
-    # shape of new physics prediction normalized to NPevents
-    if np.sum(NP_MC) != 0:
-        NP_MC = (NP_MC / np.sum(NP_MC)) * NPevents
-
-    dpoints = len(D)
-
-    def chi2bin(nuis):
-        alpha = nuis[:dpoints]
-        beta = nuis[dpoints:]
-
-        mu = NP_MC * (1 + alpha) + back_MC * (1 + beta)
-
-        return 2 * np.sum(mu - D + safe_log(D, mu)) + np.sum(alpha**2 / (err_flux**2)) + np.sum(beta**2 / (err_back**2))
-
-    cons = {"type": "ineq", "fun": lambda x: x}
-
-    res = scipy.optimize.minimize(chi2bin, np.zeros(dpoints * 2), constraints=cons)
-
-    l_decay = get_decay_length(df, coupling_factor=coupling_factor)
-
-    return chi2bin(res.x) if (l_decay < decay_limit) else (chi2bin(res.x) + l_decay**1.5)
-
-
-def chi2_binned_rate_3p2(df, couplings, coupling_factor, back_MC, D, sys=[0.1, 0.1], type_fit="angle", decay_limit=10000):
-    err_flux = sys[0]
-    err_back = sys[1]
-
-    df_decay = av.select_MB_decay(df, coupling_factor=coupling_factor)
-    sum_w_post_smearing = np.abs(np.sum(df_decay["reco_w"]))
-    total_Nevent_MB = 400 * np.abs((1 / df_decay["reco_eff"][0]))
-    if type_fit == "angle":
-        histograms = plot_tools.get_histogram1D(df_decay, NEVENTS=total_Nevent_MB, varplot="reco_angle", loc="../")
-    else:
-        histograms = plot_tools.get_histogram1D(df_decay, NEVENTS=total_Nevent_MB, varplot="reco_Enu", loc="../")
-    NP_MC = histograms[0]
-    NPevents = ((couplings * couplings_heavy) / couplings_default) ** 2 * sum_w_post_smearing
-
-    # shape of new physics prediction normalized to NPevents
-    if np.sum(NP_MC) != 0:
-        NP_MC = (NP_MC / np.sum(NP_MC)) * NPevents
-
-    dpoints = len(D)
-
-    def chi2bin(nuis):
-        alpha = nuis[:dpoints]
-        beta = nuis[dpoints:]
-
-        mu = NP_MC * (1 + alpha) + back_MC * (1 + beta)
-
-        return 2 * np.sum(mu - D + safe_log(D, mu)) + np.sum(alpha**2 / (err_flux**2)) + np.sum(beta**2 / (err_back**2))
-
-    cons = {"type": "ineq", "fun": lambda x: x}
-
-    res = scipy.optimize.minimize(chi2bin, np.zeros(dpoints * 2), constraints=cons)
-
-    l_decay = get_decay_length(df, coupling_factor=coupling_factor)
-
-    return chi2bin(res.x) if (l_decay < decay_limit) else (chi2bin(res.x) + l_decay**1.5)
-
-
 def chi2_MiniBooNE_2020_3p1(
-    df, umu4, cut="circ1", on_shell=True, v4i_f=v4i_f, v4i_def=v4i_def, vmu4_f=vmu4_f, vmu4_def=vmu4_def, r_eps=r_eps, l_decay_proper_cm=1
+    df,
+    umu4,
+    cut="circ1",
+    on_shell=True,
+    v4i_f=v4i_f,
+    v4i_def=v4i_def,
+    vmu4_f=vmu4_f,
+    vmu4_def=vmu4_def,
+    r_eps=r_eps,
+    l_decay_proper_cm=1,
 ):
     """chi2_MiniBooNE_2020_3p1 This compute MiniBooNE chi2 from raw DarkNews dataframes -- straight from generation.
 
@@ -347,16 +375,16 @@ def chi2_MiniBooNE_2020_3p1(
     ----------
     df : pd.DataFrame
         _description_
-    umu4 : _type_
+    umu4 : np.float
         _description_
     cut : str, optional
         _description_, by default "circ1"
     on_shell : bool, optional
         _description_, by default True
-    v4i_f : _type_, optional
-        _description_, by default v4i_f
-    v4i_def : _type_, optional
-        _description_, by default v4i_def
+    v4i_f : np.float, optional
+        VD4, by default v4i_f
+    v4i_def : np.float, optional
+        VD4, by default v4i_def
     vmu4_f : _type_, optional
         _description_, by default vmu4_f
     vmu4_def : _type_, optional
@@ -380,7 +408,9 @@ def chi2_MiniBooNE_2020_3p1(
         factor = (r_eps * v4i_f(umu4) / v4i_def) ** 2
 
     decay_l = l_decay_proper_cm / factor
-    df_decay = decayer.decay_selection(df, l_decay_proper_cm=decay_l, experiment="miniboone", weights="w_event_rate")
+    df_decay = decayer.decay_selection(
+        df, l_decay_proper_cm=decay_l, experiment="miniboone", weights="w_event_rate"
+    )
     df_decay = analysis.reco_nueCCQElike_Enu(df_decay, cut=cut)
 
     # Jaime's initial code
@@ -389,11 +419,43 @@ def chi2_MiniBooNE_2020_3p1(
 
     df_decay = df_decay[df_decay.reco_w > 0]
     sum_w_post_smearing = np.abs(np.sum(df_decay["reco_w"]))
-    hist = np.histogram(df_decay["reco_Enu"], weights=df_decay["reco_w"], bins=bin_e_def, density=False)
-    NP_MC = hist[0]
     NPevents = (vmu4_f(umu4) / vmu4_def) ** 2 * sum_w_post_smearing * r_eps**2
 
-    return chi2_MiniBooNE_2020(NP_MC, NPevents)
+    return chi2_MiniBooNE_2020(get_MiniBooNE_Enu_bin_vals(df_decay), NPevents)
+
+
+def get_MiniBooNE_Enu_bin_vals(df):
+    hist = np.histogram(
+        df["reco_Enu"], weights=df["reco_w"], bins=bin_e_def, density=False
+    )
+    return hist[0]
+
+
+def get_MiniBooNE_Evis_bin_vals(df):
+    hist = np.histogram(
+        df["reco_Evis"], weights=df["reco_w"], bins=bin_evis_def, density=False
+    )
+    return hist[0]
+
+
+def get_MiniBooNE_Costheta_bin_vals(df):
+    hist = np.histogram(
+        df["reco_costheta_beam"],
+        weights=df["reco_w"],
+        bins=bin_costheta_def,
+        density=False,
+    )
+    return hist[0]
+
+
+def get_MiniBooNE_Invmass_bin_vals(df):
+    hist = np.histogram(
+        df["reco_mgg"],
+        weights=df["reco_w"],
+        bins=bin_invmass_def,
+        density=False,
+    )
+    return hist[0]
 
 
 def chi2_MiniBooNE_2020_3p2(df, vmu5, vmu5_def=vmu5_def, r_eps=1.0):
@@ -418,7 +480,9 @@ def chi2_MiniBooNE_2020_3p2(df, vmu5, vmu5_def=vmu5_def, r_eps=1.0):
     df_decay = df.copy(deep=True)
 
     sum_w_post_smearing = np.abs(np.sum(df_decay["reco_w"])) * r_eps**2
-    histograms = np.histogram(df_decay["reco_Enu"], weights=df_decay["reco_w"], bins=bin_e_def, density=False)
+    histograms = np.histogram(
+        df_decay["reco_Enu"], weights=df_decay["reco_w"], bins=bin_e_def, density=False
+    )
     NP_MC = histograms[0]
     NPevents = (vmu5 / vmu5_def) ** 2 * sum_w_post_smearing
 
@@ -434,24 +498,46 @@ def chi2_MiniBooNE_2020_3p2_nodecay(NP_MC, NPevents):
 
     ####
     # using __init__ path definition
-    bin_e = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_binboundaries_nue_lowe.txt"))
+    bin_e = np.genfromtxt(
+        open_text(
+            "fastbnb.include.MB_data_release.numode",
+            "miniboone_binboundaries_nue_lowe.txt",
+        )
+    )
     bin_w = -bin_e[:-1] + bin_e[1:]
     bin_c = bin_e[:-1] + bin_w / 2
 
-    nue_data = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_nuedata_lowe.txt"))
-    numu_data = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_numudata.txt"))
+    nue_data = np.genfromtxt(
+        open_text(
+            "fastbnb.include.MB_data_release.numode", "miniboone_nuedata_lowe.txt"
+        )
+    )
+    numu_data = np.genfromtxt(
+        open_text("fastbnb.include.MB_data_release.numode", "miniboone_numudata.txt")
+    )
 
-    nue_bkg = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_nuebgr_lowe.txt"))
-    numu_bkg = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_numu.txt"))
+    nue_bkg = np.genfromtxt(
+        open_text("fastbnb.include.MB_data_release.numode", "miniboone_nuebgr_lowe.txt")
+    )
+    numu_bkg = np.genfromtxt(
+        open_text("fastbnb.include.MB_data_release.numode", "miniboone_numu.txt")
+    )
 
-    fract_covariance = np.genfromtxt(resources.open_text("fastbnb.include.MB_data_release.numode", "miniboone_full_fractcovmatrix_nu_lowe.txt"))
+    fract_covariance = np.genfromtxt(
+        open_text(
+            "fastbnb.include.MB_data_release.numode",
+            "miniboone_full_fractcovmatrix_nu_lowe.txt",
+        )
+    )
 
     MB_LEE = nue_data - nue_bkg
 
     NP_diag_matrix = np.diag(np.concatenate([NP_MC, nue_bkg * 0.0, numu_bkg * 0.0]))
     tot_diag_matrix = np.diag(np.concatenate([NP_MC, nue_bkg, numu_bkg]))
 
-    rescaled_covariance = np.dot(tot_diag_matrix, np.dot(fract_covariance, tot_diag_matrix))
+    rescaled_covariance = np.dot(
+        tot_diag_matrix, np.dot(fract_covariance, tot_diag_matrix)
+    )
     rescaled_covariance += NP_diag_matrix  # this adds the statistical error on data
 
     # collapse background part of the covariance
@@ -469,13 +555,19 @@ def chi2_MiniBooNE_2020_3p2_nodecay(NP_MC, NPevents):
     )
     error_matrix[n_signal : (n_signal + n_numu), 0:n_signal] = (
         rescaled_covariance[2 * n_signal : (2 * n_signal + n_numu), 0:n_signal]
-        + rescaled_covariance[2 * n_signal : (2 * n_signal + n_numu), n_signal : 2 * n_signal]
+        + rescaled_covariance[
+            2 * n_signal : (2 * n_signal + n_numu), n_signal : 2 * n_signal
+        ]
     )
     error_matrix[0:n_signal, n_signal : (n_signal + n_numu)] = (
         rescaled_covariance[0:n_signal, 2 * n_signal : (2 * n_signal + n_numu)]
-        + rescaled_covariance[n_signal : 2 * n_signal, 2 * n_signal : (2 * n_signal + n_numu)]
+        + rescaled_covariance[
+            n_signal : 2 * n_signal, 2 * n_signal : (2 * n_signal + n_numu)
+        ]
     )
-    error_matrix[n_signal : (n_signal + n_numu), n_signal : (n_signal + n_numu)] = rescaled_covariance[
+    error_matrix[
+        n_signal : (n_signal + n_numu), n_signal : (n_signal + n_numu)
+    ] = rescaled_covariance[
         2 * n_signal : 2 * n_signal + n_numu, 2 * n_signal : (2 * n_signal + n_numu)
     ]
 
@@ -490,7 +582,9 @@ def chi2_MiniBooNE_2020_3p2_nodecay(NP_MC, NPevents):
     inv_cov = np.linalg.inv(error_matrix)
     # print(error_matrix)
     # calculate chi^2
-    chi2 = np.dot(residuals, np.dot(inv_cov, residuals))  # + np.log(np.linalg.det(error_matrix))
+    chi2 = np.dot(
+        residuals, np.dot(inv_cov, residuals)
+    )  # + np.log(np.linalg.det(error_matrix))
 
     return chi2
 
@@ -540,27 +634,70 @@ class exp_plotter:
                 self.m5 = self.m4 * (self.delta + 1)
             self.mzprime = mzprime
             self.m5_max = m5_max
-            self.columns = ["delta", "m4", "m5", "N_events", "chi2", "sum_w_rate_df", "sum_w_flux_avg_sigma_df", "sum_w_post_smearing"]
+            self.columns = [
+                "delta",
+                "m4",
+                "m5",
+                "N_events",
+                "chi2",
+                "sum_w_rate_df",
+                "sum_w_flux_avg_sigma_df",
+                "sum_w_post_smearing",
+            ]
             self.columns_couplings = ["m4", "couplings", "chi2", "m5", "delta"]
         elif self.model == "3+1":
             self.m4 = m4
             self.mzprime = mzprime
-            self.columns = ["mzprime", "m4", "N_events", "chi2", "sum_w_rate_df", "sum_w_flux_avg_sigma_df", "sum_w_post_smearing"]
+            self.columns = [
+                "mzprime",
+                "m4",
+                "N_events",
+                "chi2",
+                "sum_w_rate_df",
+                "sum_w_flux_avg_sigma_df",
+                "sum_w_post_smearing",
+            ]
             self.columns_couplings = ["m4", "couplings", "chi2", "mzprime"]
 
         self.path_enu = self.path + "__grid_run__/chi2_enu_fit_" + self.method + ".dat"
-        self.path_angle = self.path + "__grid_run__/chi2_angle_fit_" + self.method + ".dat"
-        self.path_enu_original = self.path + "__grid_run__/chi2_enu_fit_" + self.method + "_original.dat"
-        self.path_angle_original = self.path + "__grid_run__/chi2_angle_fit_" + self.method + "_original.dat"
-        self.path_enu_coup = self.path + "__grid_run__/chi2_enu_couplings_" + self.method + ".dat"
-        self.path_angle_coup = self.path + "__grid_run__/chi2_angle_couplings_" + self.method + ".dat"
-        self.path_enu_coup_original = self.path + "__grid_run__/chi2_enu_couplings_" + self.method + "_original.dat"
-        self.path_angle_coup_original = self.path + "__grid_run__/chi2_angle_couplings_" + self.method + "_original.dat"
+        self.path_angle = (
+            self.path + "__grid_run__/chi2_angle_fit_" + self.method + ".dat"
+        )
+        self.path_enu_original = (
+            self.path + "__grid_run__/chi2_enu_fit_" + self.method + "_original.dat"
+        )
+        self.path_angle_original = (
+            self.path + "__grid_run__/chi2_angle_fit_" + self.method + "_original.dat"
+        )
+        self.path_enu_coup = (
+            self.path + "__grid_run__/chi2_enu_couplings_" + self.method + ".dat"
+        )
+        self.path_angle_coup = (
+            self.path + "__grid_run__/chi2_angle_couplings_" + self.method + ".dat"
+        )
+        self.path_enu_coup_original = (
+            self.path
+            + "__grid_run__/chi2_enu_couplings_"
+            + self.method
+            + "_original.dat"
+        )
+        self.path_angle_coup_original = (
+            self.path
+            + "__grid_run__/chi2_angle_couplings_"
+            + self.method
+            + "_original.dat"
+        )
 
         self.paths_normal = {"Enu": self.path_enu, "angle": self.path_angle}
         self.paths_coup = {"Enu": self.path_enu_coup, "angle": self.path_angle_coup}
-        self.paths_coup_original = {"Enu": self.path_enu_coup_original, "angle": self.path_angle_coup_original}
-        self.paths_original = {"Enu": self.path_enu_original, "angle": self.path_angle_original}
+        self.paths_coup_original = {
+            "Enu": self.path_enu_coup_original,
+            "angle": self.path_angle_coup_original,
+        }
+        self.paths_original = {
+            "Enu": self.path_enu_original,
+            "angle": self.path_angle_original,
+        }
 
         self.paths = {
             "normal": self.paths_normal,
@@ -570,74 +707,180 @@ class exp_plotter:
         }
 
         self.plots_paths_fitting_enu = {
-            "chi2": self.path + "__grid_run__/plots/chi2_enu_" + self.neutrino_type + "_" + self.method + ".pdf",
-            "chi2_sigmas": self.path + "__grid_run__/plots/chi2_enu_" + self.neutrino_type + "_" + self.method + "_sigmas.pdf",
-            "nevents": self.path + "__grid_run__/plots/nevents_enu_" + self.neutrino_type + "_" + self.method + ".pdf",
+            "chi2": self.path
+            + "__grid_run__/plots/chi2_enu_"
+            + self.neutrino_type
+            + "_"
+            + self.method
+            + ".pdf",
+            "chi2_sigmas": self.path
+            + "__grid_run__/plots/chi2_enu_"
+            + self.neutrino_type
+            + "_"
+            + self.method
+            + "_sigmas.pdf",
+            "nevents": self.path
+            + "__grid_run__/plots/nevents_enu_"
+            + self.neutrino_type
+            + "_"
+            + self.method
+            + ".pdf",
         }
         self.plots_paths_fitting_angle = {
-            "chi2": self.path + "__grid_run__/plots/chi2_angle_" + self.neutrino_type + "_" + self.method + ".pdf",
-            "chi2_sigmas": self.path + "__grid_run__/plots/chi2_angle_" + self.neutrino_type + "_" + self.method + "_sigmas.pdf",
-            "nevents": self.path + "__grid_run__/plots/nevents_angle_" + self.neutrino_type + "_" + self.method + ".pdf",
+            "chi2": self.path
+            + "__grid_run__/plots/chi2_angle_"
+            + self.neutrino_type
+            + "_"
+            + self.method
+            + ".pdf",
+            "chi2_sigmas": self.path
+            + "__grid_run__/plots/chi2_angle_"
+            + self.neutrino_type
+            + "_"
+            + self.method
+            + "_sigmas.pdf",
+            "nevents": self.path
+            + "__grid_run__/plots/nevents_angle_"
+            + self.neutrino_type
+            + "_"
+            + self.method
+            + ".pdf",
         }
-        self.plots_paths_fitting = {"Enu": self.plots_paths_fitting_enu, "angle": self.plots_paths_fitting_angle}
+        self.plots_paths_fitting = {
+            "Enu": self.plots_paths_fitting_enu,
+            "angle": self.plots_paths_fitting_angle,
+        }
 
         self.hnl_type = r"Dirac" if self.neutrino_type == "dirac" else r"Majorana"
         self.plots_titles_fitting_enu = {
             "chi2": r"$\chi^2/dof$ for $E_\nu$",
             "chi2_sigmas": r"$\Delta \chi^2$ for $E_\nu$, MiniBooNE, " + self.hnl_type
             if self.model == "3+1"
-            else r"$\Delta \chi^2$ for $E_\nu$, $m_{Z\prime}=" + str(self.mzprime) + r"\ \mathrm{GeV}$, MiniBooNE, " + self.hnl_type,
+            else r"$\Delta \chi^2$ for $E_\nu$, $m_{Z\prime}="
+            + str(self.mzprime)
+            + r"\ \mathrm{GeV}$, MiniBooNE, "
+            + self.hnl_type,
             "nevents": r"$N_{events}$ for $E_\nu$",
         }
         self.plots_titles_fitting_angle = {
             "chi2": r"$\chi^2/dof$ for $\theta_{ee}^{\mathrm{beam}}$",
-            "chi2_sigmas": r"$\Delta \chi^2$ for $\theta_{ee}^{\mathrm{beam}}$, MiniBooNE, " + self.hnl_type
+            "chi2_sigmas": r"$\Delta \chi^2$ for $\theta_{ee}^{\mathrm{beam}}$, MiniBooNE, "
+            + self.hnl_type
             if self.model == "3+1"
-            else r"$\Delta \chi^2$ for $\theta_{ee}^{\mathrm{beam}}$, $m_{Z\prime}=" + str(self.mzprime) + r"\ \mathrm{GeV}$, MiniBooNE, " + self.hnl_type,
+            else r"$\Delta \chi^2$ for $\theta_{ee}^{\mathrm{beam}}$, $m_{Z\prime}="
+            + str(self.mzprime)
+            + r"\ \mathrm{GeV}$, MiniBooNE, "
+            + self.hnl_type,
             "nevents": r"$N_{events}$ for $\theta_{ee}^{\mathrm{beam}}$",
         }
-        self.plots_titles_fitting = {"Enu": self.plots_titles_fitting_enu, "angle": self.plots_titles_fitting_angle}
+        self.plots_titles_fitting = {
+            "Enu": self.plots_titles_fitting_enu,
+            "angle": self.plots_titles_fitting_angle,
+        }
 
         self.plots_paths_fitting_enu = {
-            "chi2": self.path + "__grid_run__/plots/chi2_enu_" + self.neutrino_type + "_" + self.method + ".pdf",
-            "chi2_sigmas": self.path + "__grid_run__/plots/chi2_enu_" + self.neutrino_type + "_" + self.method + "_sigmas.pdf",
-            "nevents": self.path + "__grid_run__/plots/nevents_enu_" + self.neutrino_type + "_" + self.method + ".pdf",
+            "chi2": self.path
+            + "__grid_run__/plots/chi2_enu_"
+            + self.neutrino_type
+            + "_"
+            + self.method
+            + ".pdf",
+            "chi2_sigmas": self.path
+            + "__grid_run__/plots/chi2_enu_"
+            + self.neutrino_type
+            + "_"
+            + self.method
+            + "_sigmas.pdf",
+            "nevents": self.path
+            + "__grid_run__/plots/nevents_enu_"
+            + self.neutrino_type
+            + "_"
+            + self.method
+            + ".pdf",
         }
         self.plots_paths_fitting_angle = {
-            "chi2": self.path + "__grid_run__/plots/chi2_angle_" + self.neutrino_type + "_" + self.method + ".pdf",
-            "chi2_sigmas": self.path + "__grid_run__/plots/chi2_angle_" + self.neutrino_type + "_" + self.method + "_sigmas.pdf",
-            "nevents": self.path + "__grid_run__/plots/nevents_angle_" + self.neutrino_type + "_" + self.method + ".pdf",
+            "chi2": self.path
+            + "__grid_run__/plots/chi2_angle_"
+            + self.neutrino_type
+            + "_"
+            + self.method
+            + ".pdf",
+            "chi2_sigmas": self.path
+            + "__grid_run__/plots/chi2_angle_"
+            + self.neutrino_type
+            + "_"
+            + self.method
+            + "_sigmas.pdf",
+            "nevents": self.path
+            + "__grid_run__/plots/nevents_angle_"
+            + self.neutrino_type
+            + "_"
+            + self.method
+            + ".pdf",
         }
-        self.plots_paths_fitting = {"Enu": self.plots_paths_fitting_enu, "angle": self.plots_paths_fitting_angle}
+        self.plots_paths_fitting = {
+            "Enu": self.plots_paths_fitting_enu,
+            "angle": self.plots_paths_fitting_angle,
+        }
 
         self.hnl_type = r"Dirac" if self.neutrino_type == "dirac" else r"Majorana"
         self.plots_titles_fitting_enu = {
             "chi2": r"$\chi^2/dof$ for $E_\nu$",
             "chi2_sigmas": r"$\Delta \chi^2$ for $E_\nu$, MiniBooNE, " + self.hnl_type
             if self.model == "3+1"
-            else r"$\Delta \chi^2$ for $E_\nu$, $m_{Z\prime}=" + str(self.mzprime) + r"\ \mathrm{GeV}$, MiniBooNE, " + self.hnl_type,
+            else r"$\Delta \chi^2$ for $E_\nu$, $m_{Z\prime}="
+            + str(self.mzprime)
+            + r"\ \mathrm{GeV}$, MiniBooNE, "
+            + self.hnl_type,
             "nevents": r"$N_{events}$ for $E_\nu$",
             "chi2_title": r"3+2, MiniBooNE, " + self.hnl_type
             if self.model == "3+1"
-            else r"$m_{Z\prime}=" + str(self.mzprime) + r" \ \mathrm{GeV}$, 3+2, MiniBooNE, " + self.hnl_type,
+            else r"$m_{Z\prime}="
+            + str(self.mzprime)
+            + r" \ \mathrm{GeV}$, 3+2, MiniBooNE, "
+            + self.hnl_type,
         }
         self.plots_titles_fitting_angle = {
             "chi2": r"$\chi^2/dof$ for $\theta_{ee}^{\mathrm{beam}}$",
-            "chi2_sigmas": r"$\Delta \chi^2$ for $\theta_{ee}^{\mathrm{beam}}$, MiniBooNE, " + self.hnl_type
+            "chi2_sigmas": r"$\Delta \chi^2$ for $\theta_{ee}^{\mathrm{beam}}$, MiniBooNE, "
+            + self.hnl_type
             if self.model == "3+1"
-            else r"$\Delta \chi^2$ for $\theta_{ee}^{\mathrm{beam}}$, $m_{Z\prime}=" + str(self.mzprime) + r"\ \mathrm{GeV}$, MiniBooNE, " + self.hnl_type,
+            else r"$\Delta \chi^2$ for $\theta_{ee}^{\mathrm{beam}}$, $m_{Z\prime}="
+            + str(self.mzprime)
+            + r"\ \mathrm{GeV}$, MiniBooNE, "
+            + self.hnl_type,
             "nevents": r"$N_{events}$ for $\theta_{ee}^{\mathrm{beam}}$",
             "chi2_title": r"3+2, MiniBooNE, " + self.hnl_type
             if self.model == "3+1"
-            else r"$m_{Z\prime}=" + str(self.mzprime) + r" \ \mathrm{GeV}$, 3+2, MiniBooNE, " + self.hnl_type,
+            else r"$m_{Z\prime}="
+            + str(self.mzprime)
+            + r" \ \mathrm{GeV}$, 3+2, MiniBooNE, "
+            + self.hnl_type,
         }
-        self.plots_titles_fitting = {"Enu": self.plots_titles_fitting_enu, "angle": self.plots_titles_fitting_angle}
+        self.plots_titles_fitting = {
+            "Enu": self.plots_titles_fitting_enu,
+            "angle": self.plots_titles_fitting_angle,
+        }
 
         self.minimize = minimize
 
     def set_couplings_case(name="light"):
-        self.path_enu_coup = self.path + "__grid_run__/chi2_enu_couplings_" + self.method + "_" + name + ".dat"
-        self.path_angle_coup = self.path + "__grid_run__/chi2_angle_couplings_" + self.method + "_" + name + ".dat"
+        self.path_enu_coup = (
+            self.path
+            + "__grid_run__/chi2_enu_couplings_"
+            + self.method
+            + "_"
+            + name
+            + ".dat"
+        )
+        self.path_angle_coup = (
+            self.path
+            + "__grid_run__/chi2_angle_couplings_"
+            + self.method
+            + "_"
+            + name
+            + ".dat"
+        )
 
     def run_grid(self, really_run=True):
         if self.model == "3+2":
@@ -671,7 +914,9 @@ class exp_plotter:
         self.datasets_list = grid_run_object.get_datasets_list(extension="pckl")
         self.Npoints = len(self.datasets_list)
 
-    def run_grid_couplings(self, really_run=True, delta=1, mzprime=1.25, m4=np.geomspace(0.01, 0.75, 100)):
+    def run_grid_couplings(
+        self, really_run=True, delta=1, mzprime=1.25, m4=np.geomspace(0.01, 0.75, 100)
+    ):
         if self.model == "3+2":
             delta_ar = np.array([delta])
             grid_run_object = ThreePlusTwoPipeline(
@@ -701,7 +946,9 @@ class exp_plotter:
             grid_run_object.run(nb_cores=self.nb_cores)
 
         grid_run_object.load_datasets_list()
-        self.datasets_list_couplings = grid_run_object.get_datasets_list(extension="pckl")
+        self.datasets_list_couplings = grid_run_object.get_datasets_list(
+            extension="pckl"
+        )
         self.same_dataset = False
 
     # def compute_chi2_grid(self, dataset, type_fit='Enu', num=500, sys=0.1, back_MC=0.,D=1.):
@@ -729,12 +976,16 @@ class exp_plotter:
         total_Nevent_MB = desired_MB_events * (1 / bag_reco_MB["reco_eff"][0])
 
         if type_fit == "Enu":
-            histograms = plot_tools.get_histogram1D(bag_reco_MB, NEVENTS=total_Nevent_MB, varplot="reco_Enu", loc=loc)
+            histograms = plot_tools.get_histogram1D(
+                bag_reco_MB, NEVENTS=total_Nevent_MB, varplot="reco_Enu", loc=loc
+            )
             if self.mode_chi2:
                 self.dof_enu = 6.7
             dof = self.dof_enu
         elif type_fit == "angle":
-            histograms = plot_tools.get_histogram1D(bag_reco_MB, NEVENTS=total_Nevent_MB, varplot="reco_angle", loc=loc)
+            histograms = plot_tools.get_histogram1D(
+                bag_reco_MB, NEVENTS=total_Nevent_MB, varplot="reco_angle", loc=loc
+            )
             dof = self.dof_angle
 
         NP_MC = histograms[0]
@@ -742,7 +993,9 @@ class exp_plotter:
         if self.minimize:
             init_guess = np.array([540])
             if not (self.mode_chi2) or (type_fit == "angle"):
-                chi2f = lambda nevents: chi2_binned_rate(NP_MC, nevents, back_MC, D, sys=sys)
+                chi2f = lambda nevents: chi2_binned_rate(
+                    NP_MC, nevents, back_MC, D, sys=sys
+                )
                 res = scipy.optimize.minimize(chi2f, init_guess)
                 chi2min = res.fun
                 N_events = res.x[0]
@@ -760,7 +1013,9 @@ class exp_plotter:
 
             if not (self.mode_chi2) or (type_fit == "angle"):
                 for j in range(num):
-                    chi2_arr[j] = chi2_binned_rate(NP_MC, NPevents_trials[j], back_MC, D, sys=sys)
+                    chi2_arr[j] = chi2_binned_rate(
+                        NP_MC, NPevents_trials[j], back_MC, D, sys=sys
+                    )
 
             if (self.mode_chi2) & (type_fit == "Enu"):
                 for j in range(num):
@@ -773,9 +1028,26 @@ class exp_plotter:
         chi2min /= dof
 
         if self.model == "3+2":
-            return [m4, m5, delta, chi2min, N_events, sum_w_rate_df, sum_w_flux_avg_sigma_df, sum_w_post_smearing]
+            return [
+                m4,
+                m5,
+                delta,
+                chi2min,
+                N_events,
+                sum_w_rate_df,
+                sum_w_flux_avg_sigma_df,
+                sum_w_post_smearing,
+            ]
         elif self.model == "3+1":
-            return [mzprime, m4, chi2min, N_events, sum_w_rate_df, sum_w_flux_avg_sigma_df, sum_w_post_smearing]
+            return [
+                mzprime,
+                m4,
+                chi2min,
+                N_events,
+                sum_w_rate_df,
+                sum_w_flux_avg_sigma_df,
+                sum_w_post_smearing,
+            ]
 
     def fit_grid(self, definition_number=500, type_fit="Enu"):
         num = definition_number
@@ -796,7 +1068,9 @@ class exp_plotter:
         else:
             sys = [data_MB[2], data_MB[3]]
 
-        chi2 = lambda dataset: self.compute_chi2_grid(dataset, type_fit=type_fit, sys=sys, back_MC=back_MC, D=D, num=num)
+        chi2 = lambda dataset: self.compute_chi2_grid(
+            dataset, type_fit=type_fit, sys=sys, back_MC=back_MC, D=D, num=num
+        )
 
         pool = Pool(self.nb_cores)
 
@@ -804,7 +1078,9 @@ class exp_plotter:
 
         chi2_df = pd.DataFrame(data=chi2_lists, columns=self.columns)
 
-        chi2_df.to_csv(self.paths["normal"][type_fit], sep="\t", float_format="%.5e", index=False)
+        chi2_df.to_csv(
+            self.paths["normal"][type_fit], sep="\t", float_format="%.5e", index=False
+        )
 
     def purge_grid(self, type_fit="Enu"):
         try:
@@ -823,7 +1099,9 @@ class exp_plotter:
             data["ID"] = np.arange(n_data)
 
         data_purged = data[(data["chi2"] >= 0) & (data["sum_w_post_smearing"] < 1e30)]
-        data_purged.loc[:, "sum_w_post_smearing"] = np.abs(data_purged["sum_w_post_smearing"].values)
+        data_purged.loc[:, "sum_w_post_smearing"] = np.abs(
+            data_purged["sum_w_post_smearing"].values
+        )
 
         data_purged.to_csv(path_data_source, sep="\t", float_format="%.5e", index=False)
         data.to_csv(path_data_source_ur, sep="\t", float_format="%.5e", index=False)
@@ -949,7 +1227,9 @@ class exp_plotter:
             plt.show()
         plt.clf()
 
-    def compute_chi2_grid_couplings(self, dataset, type_fit, sys, back_MC, D, couplings, num=500):
+    def compute_chi2_grid_couplings(
+        self, dataset, type_fit, sys, back_MC, D, couplings, num=500
+    ):
         desired_MB_events = 400
         length = len(couplings)
         if self.model == "3+2":
@@ -976,12 +1256,16 @@ class exp_plotter:
         total_Nevent_MB = desired_MB_events * np.abs((1 / bag_reco_MB["reco_eff"][0]))
 
         if type_fit == "Enu":
-            histograms = plot_tools.get_histogram1D(bag_reco_MB, NEVENTS=total_Nevent_MB, varplot="reco_Enu", loc=loc)
+            histograms = plot_tools.get_histogram1D(
+                bag_reco_MB, NEVENTS=total_Nevent_MB, varplot="reco_Enu", loc=loc
+            )
             if self.mode_chi2:
                 self.dof_enu = 6.7
             dof = self.dof_enu
         elif type_fit == "angle":
-            histograms = plot_tools.get_histogram1D(bag_reco_MB, NEVENTS=total_Nevent_MB, varplot="reco_angle", loc=loc)
+            histograms = plot_tools.get_histogram1D(
+                bag_reco_MB, NEVENTS=total_Nevent_MB, varplot="reco_angle", loc=loc
+            )
             dof = self.dof_angle
 
         # fitting MB
@@ -995,13 +1279,23 @@ class exp_plotter:
                 data[i, 4] = var / m4 - 1
             NPevents = (couplings[i] * 1e8) ** 2 * sum_w_post_smearing * NORMALIZATION
             if not (self.mode_chi2) or (type_fit == "angle"):
-                data[i, 2] = chi2_binned_rate(NP_MC, NPevents, back_MC, D, sys=sys) / dof
+                data[i, 2] = (
+                    chi2_binned_rate(NP_MC, NPevents, back_MC, D, sys=sys) / dof
+                )
             elif (self.mode_chi2) & (type_fit == "Enu"):
                 data[i, 2] = chi2_MiniBooNE_2020(NP_MC, NPevents) / dof
 
         return data
 
-    def fit_grid_couplings(self, definition_number=500, type_fit="Enu", i_m=0, i_mzprime=0, couplings=np.geomspace(0.0001, 0.1, 20), mode="m5"):
+    def fit_grid_couplings(
+        self,
+        definition_number=500,
+        type_fit="Enu",
+        i_m=0,
+        i_mzprime=0,
+        couplings=np.geomspace(0.0001, 0.1, 20),
+        mode="m5",
+    ):
         num = definition_number
         desired_MB_events = 400
         self.coupling_mode = mode
@@ -1048,14 +1342,27 @@ class exp_plotter:
         else:
             sys = [data_MB[2], data_MB[3]]
 
-        chi2 = lambda dataset: self.compute_chi2_grid_couplings(dataset, type_fit=type_fit, num=num, sys=sys, back_MC=back_MC, D=D, couplings=couplings)
+        chi2 = lambda dataset: self.compute_chi2_grid_couplings(
+            dataset,
+            type_fit=type_fit,
+            num=num,
+            sys=sys,
+            back_MC=back_MC,
+            D=D,
+            couplings=couplings,
+        )
 
         pool = Pool(self.nb_cores)
 
         chi2_lists = pool.map(chi2, filtered_dataset)
         chi2_enu_lists = np.concatenate(tuple(chi2_enu_lists))
         chi2_df = pd.DataFrame(data=chi2_lists, columns=self.columns_couplings)
-        chi2_df.to_csv(self.paths["couplings"][type_fit], sep="\t", float_format="%.5e", index=False)
+        chi2_df.to_csv(
+            self.paths["couplings"][type_fit],
+            sep="\t",
+            float_format="%.5e",
+            index=False,
+        )
 
     def find_min_couplings(self, fit_source="Enu"):
         try:
@@ -1104,7 +1411,9 @@ class exp_plotter:
         data_purged.to_csv(path_data_source, sep="\t", float_format="%.5e", index=False)
         data.to_csv(path_data_source_ur, sep="\t", float_format="%.5e", index=False)
 
-    def get_grid(self, type_fit="Enu", grid="normal"):  # the grid options are: normal, couplings, original or original_couplings
+    def get_grid(
+        self, type_fit="Enu", grid="normal"
+    ):  # the grid options are: normal, couplings, original or original_couplings
         try:
             path_data = self.paths[grid][type_fit]
             data = pd.read_csv(path_data, sep="\t")
@@ -1133,9 +1442,21 @@ class exp_plotter:
                 path_data = self.path_enu_coup
                 data = pd.read_csv(path_data, sep="\t")
                 plot_title1_cbar = r"$\chi^2/dof$ for $E_\nu$"
-                plot_path1 = self.path + "__grid_run__/plots/chi2_enu_couplings_" + self.neutrino_type + "_" + method + ".pdf"
+                plot_path1 = (
+                    self.path
+                    + "__grid_run__/plots/chi2_enu_couplings_"
+                    + self.neutrino_type
+                    + "_"
+                    + method
+                    + ".pdf"
+                )
                 if self.model == "3+1":
-                    plot_title2 = r"$\Delta \chi^2$ for $E_\nu$, $m_{Z \prime} = $" + str(data.loc[0, "mzprime"]) + " GeV, MiniBooNE, " + self.hnl_type
+                    plot_title2 = (
+                        r"$\Delta \chi^2$ for $E_\nu$, $m_{Z \prime} = $"
+                        + str(data.loc[0, "mzprime"])
+                        + " GeV, MiniBooNE, "
+                        + self.hnl_type
+                    )
                 else:
                     if self.coupling_mode == "m4":
                         coupling_name = r"$m_4$"
@@ -1157,14 +1478,28 @@ class exp_plotter:
                             + ",MiniBooNE, "
                             + self.hnl_type
                         )
-                plot_path2 = self.path + "__grid_run__/plots/chi2_enu_couplings_" + self.neutrino_type + "_" + method + "_sigmas.pdf"
+                plot_path2 = (
+                    self.path
+                    + "__grid_run__/plots/chi2_enu_couplings_"
+                    + self.neutrino_type
+                    + "_"
+                    + method
+                    + "_sigmas.pdf"
+                )
                 dof = self.dof_enu
 
             elif type_fit == "angle":
                 path_data = self.path_angle_coup
                 data = pd.read_csv(path_data, sep="\t")
                 plot_title1_cbar = r"$\chi^2/dof$ for $\theta_{ee}^{\mathrm{beam}}$"
-                plot_path1 = self.path + "__grid_run__/plots/chi2_angle_couplings_" + self.neutrino_type + "_" + method + ".pdf"
+                plot_path1 = (
+                    self.path
+                    + "__grid_run__/plots/chi2_angle_couplings_"
+                    + self.neutrino_type
+                    + "_"
+                    + method
+                    + ".pdf"
+                )
                 if self.model == "3+1":
                     plot_title2 = (
                         r"$\Delta \chi^2$ for $\theta_{ee}^{\mathrm{beam}}$, $m_{Z \prime} = $"
@@ -1194,7 +1529,14 @@ class exp_plotter:
                             + self.hnl_type
                         )
 
-                plot_path2 = self.path + "__grid_run__/plots/chi2_angle_couplings_" + self.neutrino_type + "_" + method + "_sigmas.pdf"
+                plot_path2 = (
+                    self.path
+                    + "__grid_run__/plots/chi2_angle_couplings_"
+                    + self.neutrino_type
+                    + "_"
+                    + method
+                    + "_sigmas.pdf"
+                )
                 dof = self.dof_angle
 
         except:
@@ -1213,10 +1555,22 @@ class exp_plotter:
                 ylabel = r"$\alpha_D (\epsilon V_{\mu 4})^2$"
             else:
                 if len(ce_string) == 1:
-                    ylabel = r"$\alpha_D (\epsilon V_{\mu 4})^2 \times$ " + rf"$10^{coupling_exp}$"
+                    ylabel = (
+                        r"$\alpha_D (\epsilon V_{\mu 4})^2 \times$ "
+                        + rf"$10^{coupling_exp}$"
+                    )
                 else:
-                    ylabel = r"$\alpha_D (\epsilon V_{\mu 4})^2 \times$ " + rf"$10^{ce_string[0]}$" + rf"$^{ce_string[1]}$"
-            plot_title1 = r"3+1, $m_{Z \prime} = $" + str(data.loc[0, "mzprime"]) + r" $\mathrm{GeV}$,MiniBooNE, " + hnl_type
+                    ylabel = (
+                        r"$\alpha_D (\epsilon V_{\mu 4})^2 \times$ "
+                        + rf"$10^{ce_string[0]}$"
+                        + rf"$^{ce_string[1]}$"
+                    )
+            plot_title1 = (
+                r"3+1, $m_{Z \prime} = $"
+                + str(data.loc[0, "mzprime"])
+                + r" $\mathrm{GeV}$,MiniBooNE, "
+                + hnl_type
+            )
         elif self.model == "3+2":
             factor_dmu = 1.0
             X = data[self.coupling_mode].values
@@ -1227,9 +1581,16 @@ class exp_plotter:
                 ylabel = r"$\alpha_D (\epsilon V_{\mu 5})^2$"
             else:
                 if len(ce_string) == 1:
-                    ylabel = r"$\alpha_D (\epsilon V_{\mu 5})^2 \times$ " + rf"$10^{coupling_exp}$"
+                    ylabel = (
+                        r"$\alpha_D (\epsilon V_{\mu 5})^2 \times$ "
+                        + rf"$10^{coupling_exp}$"
+                    )
                 else:
-                    ylabel = r"$\alpha_D (\epsilon V_{\mu 5})^2 \times$ " + rf"$10^{ce_string[0]}$" + rf"$^{ce_string[1]}$"
+                    ylabel = (
+                        r"$\alpha_D (\epsilon V_{\mu 5})^2 \times$ "
+                        + rf"$10^{ce_string[0]}$"
+                        + rf"$^{ce_string[1]}$"
+                    )
 
             if not (self.same_dataset):
                 plot_title1 = (
@@ -1286,7 +1647,9 @@ class exp_plotter:
         if min_enu[0] != "none":
             plt.plot(xmin_enu, ymin_enu, color="orange", marker=marker1, markersize=12)
         if min_angle[0] != "none":
-            plt.plot(xmin_angle, ymin_angle, color="orange", marker=marker2, markersize=12)
+            plt.plot(
+                xmin_angle, ymin_angle, color="orange", marker=marker2, markersize=12
+            )
         cbar = plt.colorbar()
         cbar.set_label(plot_title1_cbar, size=15)
         plt.title(plot_title1, fontsize=10)
@@ -1324,7 +1687,9 @@ class exp_plotter:
         if min_enu[0] != "none":
             plt.plot(xmin_enu, ymin_enu, color="orange", marker=marker1, markersize=12)
         if min_angle[0] != "none":
-            plt.plot(xmin_angle, ymin_angle, color="orange", marker=marker2, markersize=12)
+            plt.plot(
+                xmin_angle, ymin_angle, color="orange", marker=marker2, markersize=12
+            )
         plt.legend(handles=[bar_1, bar_2, bar_3], fontsize=10, loc=leg_loc)
         plt.title(plot_title2 + ", " + self.model, fontsize=10)
         plt.xlabel(xlabel, fontsize=15)
@@ -1349,10 +1714,21 @@ class exp_plotter:
             if type_fit == "Enu":
                 path_data = self.path_enu
                 if self.model == "3+1":
-                    plot_title_cbar = r"$\alpha_D (\epsilon V_{\mu 4})^2$ / $10^{-15}$ for $E_\nu$"
+                    plot_title_cbar = (
+                        r"$\alpha_D (\epsilon V_{\mu 4})^2$ / $10^{-15}$ for $E_\nu$"
+                    )
                 elif self.model == "3+2":
-                    plot_title_cbar = r"$\alpha_D (\epsilon V_{\mu 5})^2$ / $10^{-11}$ for $E_\nu$"
-                plot_path = self.path + "__grid_run__/plots/strength_enu_" + self.neutrino_type + "_" + self.method + ".pdf"
+                    plot_title_cbar = (
+                        r"$\alpha_D (\epsilon V_{\mu 5})^2$ / $10^{-11}$ for $E_\nu$"
+                    )
+                plot_path = (
+                    self.path
+                    + "__grid_run__/plots/strength_enu_"
+                    + self.neutrino_type
+                    + "_"
+                    + self.method
+                    + ".pdf"
+                )
 
             elif type_fit == "angle":
                 path_data = self.path_angle
@@ -1360,7 +1736,14 @@ class exp_plotter:
                     plot_title_cbar = r"$\alpha_D (\epsilon V_{\mu 4})^2$ / $10^{-15}$ for $\theta_{ee}^{\mathrm{beam}}$"
                 elif self.model == "3+2":
                     plot_title_cbar = r"$\alpha_D (\epsilon V_{\mu 5})^2$ / $10^{-11}$ for $\theta_{ee}^{\mathrm{beam}}$"
-                plot_path = self.path + "__grid_run__/plots/strength_angle_" + self.neutrino_type + "_" + self.method + ".pdf"
+                plot_path = (
+                    self.path
+                    + "__grid_run__/plots/strength_angle_"
+                    + self.neutrino_type
+                    + "_"
+                    + self.method
+                    + ".pdf"
+                )
 
             data = pd.read_csv(path_data, sep="\t")
         except:
@@ -1383,7 +1766,12 @@ class exp_plotter:
             Y = data["delta"].values
             xlabel = r"$m_{5}$ (GeV)"
             ylabel = r"$\Delta$"
-            plot_title = r"$m_{Z\prime}=" + str(self.mzprime) + r" \ \mathrm{GeV}$, 3+2, MiniBooNE, " + hnl_type
+            plot_title = (
+                r"$m_{Z\prime}="
+                + str(self.mzprime)
+                + r" \ \mathrm{GeV}$, 3+2, MiniBooNE, "
+                + hnl_type
+            )
             V = np.sqrt(np.abs(W / Z)) * 1e-8 / np.sqrt(np.pi)
             V = V * V * 1e11
 
@@ -1395,7 +1783,9 @@ class exp_plotter:
 
         plt.rcParams["figure.figsize"] = (6, 4)
 
-        plt.tricontourf(X, Y, V, levels=levels, locator=ticker.LogLocator(), cmap="viridis")
+        plt.tricontourf(
+            X, Y, V, levels=levels, locator=ticker.LogLocator(), cmap="viridis"
+        )
         plt.plot(xmin_enu, ymin_enu, color="orange", marker=marker1, markersize=12)
         plt.plot(xmin_angle, ymin_angle, color="orange", marker=marker2, markersize=12)
         cbar = plt.colorbar()
@@ -1473,7 +1863,11 @@ class exp_plotter:
 
         zmin = Z_source.min()
         mask_min = Z_source == zmin
-        xmin, ymin, nevents = X_source[mask_min][0], Y_source[mask_min][0], Nevents[mask_min][0]
+        xmin, ymin, nevents = (
+            X_source[mask_min][0],
+            Y_source[mask_min][0],
+            Nevents[mask_min][0],
+        )
 
         return np.array([xmin, ymin, nevents])
 
@@ -1481,13 +1875,38 @@ class exp_plotter:
         indices = ["Enu", "angle"]
 
         if self.model == "3+2":
-            path_p = self.path + "__grid_run__/p_values_z_" + str(self.mzprime) + "_3+2_" + self.neutrino_type + "_" + self.method + ".dat"
+            path_p = (
+                self.path
+                + "__grid_run__/p_values_z_"
+                + str(self.mzprime)
+                + "_3+2_"
+                + self.neutrino_type
+                + "_"
+                + self.method
+                + ".dat"
+            )
         elif self.model == "3+1":
-            path_p = self.path + "__grid_run__/p_values_3+1_" + self.neutrino_type + "_" + self.method + ".dat"
+            path_p = (
+                self.path
+                + "__grid_run__/p_values_3+1_"
+                + self.neutrino_type
+                + "_"
+                + self.method
+                + ".dat"
+            )
 
-        p_array = np.array([[self.compute_p_value(fit_source=i, fit_point=j) for j in indices] for i in indices])
+        p_array = np.array(
+            [
+                [self.compute_p_value(fit_source=i, fit_point=j) for j in indices]
+                for i in indices
+            ]
+        )
 
-        p_df = pd.DataFrame(data=p_array, index=["Plot Enu", "Plot angle"], columns=["Best fit Enu", "Best fit angle"])
+        p_df = pd.DataFrame(
+            data=p_array,
+            index=["Plot Enu", "Plot angle"],
+            columns=["Best fit Enu", "Best fit angle"],
+        )
 
         p_df.to_csv(path_p, sep="\t")
 
@@ -1497,10 +1916,26 @@ class exp_plotter:
         indices = ["Enu", "angle"]
         if self.model == "3+2":
             columns = ["m5", "delta", "N_events"]
-            path_bf = self.path + "__grid_run__/bf_z_" + str(self.mzprime) + "_3+2_" + self.neutrino_type + "_" + self.method + ".dat"
+            path_bf = (
+                self.path
+                + "__grid_run__/bf_z_"
+                + str(self.mzprime)
+                + "_3+2_"
+                + self.neutrino_type
+                + "_"
+                + self.method
+                + ".dat"
+            )
         elif self.model == "3+1":
             columns = ["mzprime", "m4", "N_events"]
-            path_bf = self.path + "__grid_run__/bf_3+1_" + self.neutrino_type + "_" + self.method + ".dat"
+            path_bf = (
+                self.path
+                + "__grid_run__/bf_3+1_"
+                + self.neutrino_type
+                + "_"
+                + self.method
+                + ".dat"
+            )
 
         bf_array = np.array([self.compute_best_fits(fit_source=fs) for fs in indices])
 
@@ -1523,7 +1958,9 @@ class exp_plotter:
                 m4 = self.datasets_list[i]["m4"]
                 delta = round_sig((m5 - m4) / m4, sig=rounding)
                 m5 = round_sig(m5, sig=rounding)
-                if (round_sig(m5_bf, sig=rounding) == m5) & (round_sig(delta_bf, sig=rounding) == delta):
+                if (round_sig(m5_bf, sig=rounding) == m5) & (
+                    round_sig(delta_bf, sig=rounding) == delta
+                ):
                     location = self.datasets_list[i]["dataset"]
         elif self.model == "3+1":
             m4_bf = df_bf.loc[fit_source, "m4"]
@@ -1531,7 +1968,9 @@ class exp_plotter:
             for i in range(n):
                 mzprime = round_sig(self.datasets_list[i]["mzprime"], sig=rounding)
                 m4 = round_sig(self.datasets_list[i]["m4"], sig=rounding)
-                if (round_sig(m4_bf, sig=rounding) == m4) & (round_sig(mzprime_bf, sig=rounding) == mzprime):
+                if (round_sig(m4_bf, sig=rounding) == m4) & (
+                    round_sig(mzprime_bf, sig=rounding) == mzprime
+                ):
                     location = self.datasets_list[i]["dataset"]
 
         df = pd.read_pickle(location)
@@ -1543,11 +1982,35 @@ class exp_plotter:
         elif fit_source == "angle":
             source = r"$\theta_{ee}^{\mathrm{beam}}$"
 
-        title = "MiniBooNE: best fit for " + source + ", " + self.model + ", " + self.hnl_type
+        title = (
+            "MiniBooNE: best fit for "
+            + source
+            + ", "
+            + self.model
+            + ", "
+            + self.hnl_type
+        )
 
-        plot_tools.plot_all_rates(df, fit_source, Nevents=nevents, title=title, plot_muB=False, path=PATH, loc="../")
+        plot_tools.plot_all_rates(
+            df,
+            fit_source,
+            Nevents=nevents,
+            title=title,
+            plot_muB=False,
+            path=PATH,
+            loc="../",
+        )
 
-    def plot_bf_xsection(self, definition_number=500, fit_source="Enu", regime="coherent", gD=1.0, epsilon=1e-2, Umu4=1e-6, UD4=1.0):
+    def plot_bf_xsection(
+        self,
+        definition_number=500,
+        fit_source="Enu",
+        regime="coherent",
+        gD=1.0,
+        epsilon=1e-2,
+        Umu4=1e-6,
+        UD4=1.0,
+    ):
         N_events_LEE = 560.6
 
         if self.neutrino_type == "dirac":
@@ -1566,7 +2029,9 @@ class exp_plotter:
         mzprime_bf = df_bf.loc[fit_source, "mzprime"]
         N_events = df_bf.loc[fit_source, "N_events"]
 
-        xsecs = self.compute_xsecs(m4_bf, mzprime_bf, gD=gD, epsilon=epsilon, Umu4=Umu4, UD4=UD4)
+        xsecs = self.compute_xsecs(
+            m4_bf, mzprime_bf, gD=gD, epsilon=epsilon, Umu4=Umu4, UD4=UD4
+        )
 
         theseMCs = xsecs[0]
         mc_lowT = xsecs[1]
@@ -1597,12 +2062,24 @@ class exp_plotter:
                     norm = N_events_LEE / N_events
                     #                 print(norm/(mc.ups_case.Vij**2*mc.ups_case.Vhad**2))
                     if "conserving" in key:
-                        ax.plot(enu_axis, sigmas / norm, label=key.replace("_", " ").replace("conserving", "HC").replace("coherent", "coh"), **args)
+                        ax.plot(
+                            enu_axis,
+                            sigmas / norm,
+                            label=key.replace("_", " ")
+                            .replace("conserving", "HC")
+                            .replace("coherent", "coh"),
+                            **args,
+                        )
                     else:
                         ax.plot(enu_axis, sigmas / norm, **args)
 
         ax.set_title(
-            rf"$m_{{Z^\prime}}= {mc.ups_case.mzprime:.2f}$ GeV,  $m_4 = {mc.ups_case.m_ups*1e3:.0f}$ MeV" + ", " + hnl_type + ", bf for " + source, fontsize=12
+            rf"$m_{{Z^\prime}}= {mc.ups_case.mzprime:.2f}$ GeV,  $m_4 = {mc.ups_case.m_ups*1e3:.0f}$ MeV"
+            + ", "
+            + hnl_type
+            + ", bf for "
+            + source,
+            fontsize=12,
         )
         ax.set_yscale("log")
         ax.set_xscale("log")
@@ -1631,7 +2108,23 @@ class exp_plotter:
     def do_whole_analysis(
         self,
         really_run="False",
-        processes=[True, False, False, True, True, False, False, False, False, False, False, True, True, True, True],
+        processes=[
+            True,
+            False,
+            False,
+            True,
+            True,
+            False,
+            False,
+            False,
+            False,
+            False,
+            False,
+            True,
+            True,
+            True,
+            True,
+        ],
         chi2_enu=True,
         chi2_angle=True,
         couplings_light_enu=np.geomspace(0.1e-23, 2.5e-23, 40),
@@ -1671,34 +2164,62 @@ class exp_plotter:
         if processes[5]:
             print("Fitting couplings Enu for light particle")
             self.set_couplings_case(name="light")
-            self.fit_grid_couplings(type_fit="Enu", i_m=im_light, couplings=couplings_light_enu, mode=couplings_mode)
+            self.fit_grid_couplings(
+                type_fit="Enu",
+                i_m=im_light,
+                couplings=couplings_light_enu,
+                mode=couplings_mode,
+            )
         if processes[6]:
             print("Fitting couplings angle for light particle")
             self.set_couplings_case(name="light")
-            self.fit_grid_couplings(type_fit="angle", i_m=im_light, couplings=couplings_light_angle, mode=couplings_mode)
+            self.fit_grid_couplings(
+                type_fit="angle",
+                i_m=im_light,
+                couplings=couplings_light_angle,
+                mode=couplings_mode,
+            )
         if processes[7]:
             print("Plotting fit of couplings for light particle")
             self.set_couplings_case(name="light")
             self.purge_grid_couplings(type_fit="Enu")
             self.purge_grid_couplings(type_fit="angle")
-            self.plot_couplings_mass(type_fit="Enu", leg_loc="upper left", coupling_exp=coupling_exp_light)
-            self.plot_couplings_mass(type_fit="angle", leg_loc="upper left", coupling_exp=coupling_exp_light)
+            self.plot_couplings_mass(
+                type_fit="Enu", leg_loc="upper left", coupling_exp=coupling_exp_light
+            )
+            self.plot_couplings_mass(
+                type_fit="angle", leg_loc="upper left", coupling_exp=coupling_exp_light
+            )
 
         if processes[8]:
             print("Fitting couplings Enu for heavy particle")
             self.set_couplings_case(name="heavy")
-            self.fit_grid_couplings(type_fit="Enu", i_m=im_heavy, couplings=couplings_heavy_enu, mode=couplings_mode)
+            self.fit_grid_couplings(
+                type_fit="Enu",
+                i_m=im_heavy,
+                couplings=couplings_heavy_enu,
+                mode=couplings_mode,
+            )
         if processes[9]:
             print("Fitting couplings angle for heavy particle")
             self.set_couplings_case(name="heavy")
-            self.fit_grid_couplings(type_fit="angle", i_m=im_heavy, couplings=couplings_heavy_angle, mode=couplings_mode)
+            self.fit_grid_couplings(
+                type_fit="angle",
+                i_m=im_heavy,
+                couplings=couplings_heavy_angle,
+                mode=couplings_mode,
+            )
         if processes[10]:
             print("Plotting fit of couplings for heavy particle")
             self.set_couplings_case(name="heavy")
             self.purge_grid_couplings(type_fit="Enu")
             self.purge_grid_couplings(type_fit="angle")
-            self.plot_couplings_mass(type_fit="Enu", leg_loc="upper left", coupling_exp=coupling_exp_heavy)
-            self.plot_couplings_mass(type_fit="angle", leg_loc="upper left", coupling_exp=coupling_exp_heavy)
+            self.plot_couplings_mass(
+                type_fit="Enu", leg_loc="upper left", coupling_exp=coupling_exp_heavy
+            )
+            self.plot_couplings_mass(
+                type_fit="angle", leg_loc="upper left", coupling_exp=coupling_exp_heavy
+            )
 
         if processes[11]:
             print("Computing p-values")
@@ -1730,18 +2251,37 @@ class exp_plotter:
         method_plot = self.method + "_" + descriptor
 
         print("Running grid")
-        self.run_grid_couplings(really_run=really_run, delta=delta, mzprime=mzprime, m4=m4)
+        self.run_grid_couplings(
+            really_run=really_run, delta=delta, mzprime=mzprime, m4=m4
+        )
 
         if fit_enu:
             print("Fitting couplings Enu for " + descriptor + " particle")
-            self.fit_grid_couplings(type_fit="Enu", couplings=couplings_enu, mode=couplings_mode, method=method_plot)
+            self.fit_grid_couplings(
+                type_fit="Enu",
+                couplings=couplings_enu,
+                mode=couplings_mode,
+                method=method_plot,
+            )
 
         if fit_angle:
             print("Fitting couplings angle for " + descriptor + " particle")
-            self.fit_grid_couplings(type_fit="angle", couplings=couplings_angle, mode=couplings_mode, method=method_plot)
+            self.fit_grid_couplings(
+                type_fit="angle",
+                couplings=couplings_angle,
+                mode=couplings_mode,
+                method=method_plot,
+            )
 
         print("Plotting fit of couplings for " + descriptor + " particle")
         self.purge_grid_couplings(type_fit="Enu", method=method_plot)
         self.purge_grid_couplings(type_fit="angle", method=method_plot)
-        self.plot_couplings_mass(type_fit="Enu", leg_loc="upper left", method=method_plot, coupling_factor=1)
-        self.plot_couplings_mass(type_fit="angle", leg_loc="upper left", method=method_plot, coupling_factor=1)
+        self.plot_couplings_mass(
+            type_fit="Enu", leg_loc="upper left", method=method_plot, coupling_factor=1
+        )
+        self.plot_couplings_mass(
+            type_fit="angle",
+            leg_loc="upper left",
+            method=method_plot,
+            coupling_factor=1,
+        )
