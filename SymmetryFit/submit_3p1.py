@@ -137,7 +137,8 @@ def sub3p1_coupling(EPSILON_CASE):
     )
 
 
-# sub3p1(EPSILON_CASE=1e-2)
+sub3p1(EPSILON_CASE=1e-2)
 # sub3p1(EPSILON_CASE=1e-3)
 # sub3p1(EPSILON_CASE=1e-4)
+
 # sub3p1_coupling(EPSILON_CASE=1e-2)
