@@ -1,0 +1,10 @@
+#!/bin/bash
+#SBATCH --job-name=3p1_coupling_20230512_04
+#SBATCH --output=slurm/output/3p1_coupling_20230512_04.output
+#SBATCH --error=slurm/error/3p1_coupling_20230512_04.error
+
+#SBATCH --partition=debugq
+#SBATCH --array=0-960
+
+srun --ntasks=1 python fit_3p1_cooupling.py --i_line $SLURM_ARRAY_TASK_ID --path results/3p1_general/5m_12d_9h_18m_18s_ --cut circ1 --print_spectra 1 --experiment miniboone_fhc &
+wait

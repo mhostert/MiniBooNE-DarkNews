@@ -6,7 +6,6 @@ import matplotlib.patches as mpatches
 from matplotlib import cm
 from scipy.stats import chi2 as chi2_scipy
 
-# from pathos.pools import ProcessPool
 from pathos.multiprocessing import ProcessingPool as Pool
 from matplotlib import ticker
 

@@ -34,6 +34,7 @@ def fit_point_3p1(
     df = GenLauncher(
         mzprime=mzprimes,
         m4=m4s,
+        experiment=experiment,
         **kwargs,
     ).run()
     dl = df.attrs["N4_ctau0"]
@@ -42,6 +43,7 @@ def fit_point_3p1(
     df2 = GenLauncher(
         mzprime=mzprimes,
         m4=m4s,
+        experiment=experiment+"_dirt",
         **kwargs,
     ).run()
 

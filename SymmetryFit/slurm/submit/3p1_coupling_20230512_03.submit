@@ -1,0 +1,8 @@
+#!/bin/bash
+#SBATCH --job-name=3p1_coupling_20230512_03
+#SBATCH --output=slurm/submit/3p1_coupling_20230512_03.output
+#SBATCH --error=slurm/submit/3p1_coupling_20230512_03.error
+
+#SBATCH --partition=debugq
+
+jid0=($(sbatch slurm/submit/3p1_coupling_20230512_04.submit))

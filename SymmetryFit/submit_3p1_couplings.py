@@ -8,8 +8,8 @@ from slurmpter import Slurm, SlurmJob
 """
     Some global variables for the grid fitting procedure
 """
-QUEUE = "defq"  # "defq" or "debugq"
-RUN_PATH = "results/3p1_general/"  # Path for this type of scan
+QUEUE = "debugq"  # "defq" or "debugq"
+RUN_PATH = "results/3p1_coupling/"  # Path for this type of scan
 Path(RUN_PATH).mkdir(parents=True, exist_ok=True)  # create it if it doesn't exist
 
 now = datetime.now()  # Time stamp
@@ -92,7 +92,7 @@ with open(scanfile, "wb") as f:
     which is then used to read the corresponding values from the scanfile.
 """
 slurm = Slurm(
-    name=f"3p1_coupl:.2g}",
+    name=f"3p1_coupling",
     submit=submit,
     extra_lines=[f"#SBATCH --partition={QUEUE}"],
 )
