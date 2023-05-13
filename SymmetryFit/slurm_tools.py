@@ -20,9 +20,9 @@ def slurm_submit(
     input_kwargs,
     jobname="dnfitter",
     optional_args="",
-    queue="debugq",
+    queue="defq",
     exclude="cn070",
-    timeout="01:00:00",
+    timeout="03:00:00",
 ):
     if queue == "debugq":
         print(

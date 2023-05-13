@@ -10,7 +10,7 @@ NEVAL = int(1e5)
 POINTS = 40
 
 
-def sub3p2(SCAN_TYPE, FIXED_MASS, EPSILON=1e-4):
+def sub3p2(SCAN_TYPE, FIXED_MASS, EPSILON=1e-2):
     kwargs = {
         "Umu4": np.sqrt(1.0e-12),
         "Umu5": np.sqrt(1.0e-12),
@@ -80,17 +80,17 @@ def sub3p2(SCAN_TYPE, FIXED_MASS, EPSILON=1e-4):
     )
 
 
-# sub3p2(SCAN_TYPE="mzprime", FIXED_MASS=0.015, EPSILON=1e-4)
-# sub3p2(SCAN_TYPE="mzprime", FIXED_MASS=0.150, EPSILON=1e-4)
-# sub3p2(SCAN_TYPE="mzprime", FIXED_MASS=0.250, EPSILON=1e-4)
+sub3p2(SCAN_TYPE="mzprime", FIXED_MASS=0.015, EPSILON=1e-4)
+sub3p2(SCAN_TYPE="mzprime", FIXED_MASS=0.150, EPSILON=1e-4)
+sub3p2(SCAN_TYPE="mzprime", FIXED_MASS=0.250, EPSILON=1e-4)
 
-# sub3p2(SCAN_TYPE="mzprime", FIXED_MASS=0.015, EPSILON=1e-3)
-# sub3p2(SCAN_TYPE="mzprime", FIXED_MASS=0.150, EPSILON=1e-3)
-# sub3p2(SCAN_TYPE="mzprime", FIXED_MASS=0.250, EPSILON=1e-3)
+sub3p2(SCAN_TYPE="mzprime", FIXED_MASS=0.015, EPSILON=1e-3)
+sub3p2(SCAN_TYPE="mzprime", FIXED_MASS=0.150, EPSILON=1e-3)
+sub3p2(SCAN_TYPE="mzprime", FIXED_MASS=0.250, EPSILON=1e-3)
 
-# sub3p2(SCAN_TYPE="mzprime", FIXED_MASS=0.015, EPSILON=1e-2)
-# sub3p2(SCAN_TYPE="mzprime", FIXED_MASS=0.150, EPSILON=1e-2)
-# sub3p2(SCAN_TYPE="mzprime", FIXED_MASS=0.250, EPSILON=1e-2)
+sub3p2(SCAN_TYPE="mzprime", FIXED_MASS=0.015, EPSILON=1e-2)
+sub3p2(SCAN_TYPE="mzprime", FIXED_MASS=0.150, EPSILON=1e-2)
+sub3p2(SCAN_TYPE="mzprime", FIXED_MASS=0.250, EPSILON=1e-2)
 
-# sub3p2(SCAN_TYPE="delta", FIXED_MASS=1.25, EPSILON=1e-2)
-# sub3p2(SCAN_TYPE="delta", FIXED_MASS=1.25, EPSILON=1e-4)
+sub3p2(SCAN_TYPE="delta", FIXED_MASS=1.25, EPSILON=1e-2)
+sub3p2(SCAN_TYPE="delta", FIXED_MASS=1.25, EPSILON=1e-4)

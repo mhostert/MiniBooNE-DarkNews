@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import scipy
+from scipy.optimize import dual_annealing
 import argparse
 
 from DarkNews.GenLauncher import GenLauncher
@@ -21,7 +22,6 @@ def fit_point_3p1(
     **kwargs,
 ):
     m4s, mzprimes = gf.get_line_from_input(path, i_line)
-
     if not kwargs:
         kwargs = gf.get_kwargs_from_input(path)
 
@@ -66,13 +66,83 @@ def fit_point_3p1(
         v4i_f = lambda umu4: kwargs["gD"] * kwargs["UD4"] * umu4
 
         ###################################################################################################
-        # test_umu4 = np.geomspace(umu4_max * 1e-10, umu4_max, 50)
+        test_umu4 = np.geomspace(umu4_max * 1e-10, umu4_max, 500)
+        chi2_test = np.array(
+            [
+                ff.chi2_MiniBooNE_2020_3p1(
+                    df_tot,
+                    test,
+                    cut=cut,
+                    on_shell=on_shell,
+                    v4i_f=v4i_f,
+                    v4i_def=v4i_def,
+                    vmu4_f=vmu4_f,
+                    vmu4_def=vmu4_def,
+                    l_decay_proper_cm=decay_l,
+                )
+                for test in test_umu4
+            ]
+        )
+        chi2_test[chi2_test < 0] = 1e10
+        theta_init_guess = -np.log10(test_umu4[np.argmin(chi2_test)] / umu4_max)
+
+        chi2_func = lambda theta: ff.chi2_MiniBooNE_2020_3p1(
+            df_tot,
+            umu4_max * 10 ** (-(theta)),
+            cut=cut,
+            on_shell=on_shell,
+            v4i_f=v4i_f,
+            v4i_def=v4i_def,
+            vmu4_f=vmu4_f,
+            vmu4_def=vmu4_def,
+            l_decay_proper_cm=decay_l,
+        )
+
+        # # # 4. DO THE FITTING
+        # res = scipy.optimize.minimize(
+        #     chi2_func, theta_init_guess, method="Powell", bounds=[(0, 10)]
+        # )
+        # x_min = res.x[0]
+        # y_min = res.fun
+
+        # Dual annealing is stochastic, so we run the algo a few times to be sure
+        x_minima = []
+        y_minima = []
+        for i in range(5):
+            # print("Minimizing with dual annealing, iteration", i, "of 5")
+            # res = dual_annealing(chi2_func, bounds=[(0, 10)], maxfun=1000, maxiter=100)
+            res = scipy.optimize.minimize(
+                chi2_func, theta_init_guess, method="Powell", bounds=[(0, 10)]
+            )
+            x_minima.append(res.x[0])
+            y_minima.append(res.fun)
+
+        print(x_minima, y_minima)
+        # Get minimum of the multiple minimizations above
+        x_min = x_minima[np.argmin(y_minima)]
+        y_min = np.min(y_minima)
+
+        umu4_bf = umu4_max * 10 ** (-x_min)
+        vmu4_bf = vmu4_f(umu4_bf)
+
+        ###################################################################################################
+        ### Jaime's Corner
+        # test_guess = np.concatenate(
+        #     [
+        #         np.arange(1, 10) * 1e-4,
+        #         np.arange(1, 10) * 1e-3,
+        #         np.arange(1, 10) * 1e-2,
+        #         np.arange(1, 11) * 1e-1,
+        #     ]
+        # )
+        # n_test = len(test_guess)
+        # test_theta = np.sqrt(np.log(1.0 / test_guess))
+        # test_umu4 = umu4_max * np.exp(-(test_theta**2))
         # chi2_test = np.array(
         #     [
         #         ff.chi2_MiniBooNE_2020_3p1(
         #             df_tot,
-        #             test,
-        #             cut=cut,
+        #             test_umu4[k_test],
         #             on_shell=on_shell,
         #             v4i_f=v4i_f,
         #             v4i_def=v4i_def,
@@ -80,16 +150,17 @@ def fit_point_3p1(
         #             vmu4_def=vmu4_def,
         #             l_decay_proper_cm=decay_l,
         #         )
-        #         for test in test_umu4
+        #         for k_test in range(n_test)
         #     ]
         # )
-        # chi2_test[chi2_test < 0] = 1e10
-        # theta_init_guess = -np.log10(test_umu4[np.argmin(chi2_test)] / umu4_max)
+        # mask = chi2_test < 0
+        # chi2_test[mask] = 1e10
+        # theta_guess = test_theta[chi2_test == chi2_test.min()].mean()
+        # init_guess = np.array([theta_guess])
 
         # chi2 = lambda theta: ff.chi2_MiniBooNE_2020_3p1(
         #     df_tot,
-        #     umu4_max * 10 ** (-(theta)),
-        #     cut=cut,
+        #     umu4_max * np.exp(-(theta**2)),
         #     on_shell=on_shell,
         #     v4i_f=v4i_f,
         #     v4i_def=v4i_def,
@@ -99,60 +170,9 @@ def fit_point_3p1(
         # )
 
         # # 4. DO THE FITTING
-        # res = scipy.optimize.minimize(
-        #     chi2, theta_init_guess, method="Powell", bounds=[(0, 10)]
-        # )
-        # umu4_bf = umu4_max * 10 ** (-res.x[0])
+        # res = scipy.optimize.minimize(chi2, init_guess)
+        # umu4_bf = umu4_max * np.exp(-res.x[0] ** 2)
         # vmu4_bf = vmu4_f(umu4_bf)
-
-        ###################################################################################################
-        ### Jaime's Corner
-        test_guess = np.concatenate(
-            [
-                np.arange(1, 10) * 1e-4,
-                np.arange(1, 10) * 1e-3,
-                np.arange(1, 10) * 1e-2,
-                np.arange(1, 11) * 1e-1,
-            ]
-        )
-        n_test = len(test_guess)
-        test_theta = np.sqrt(np.log(1.0 / test_guess))
-        test_umu4 = umu4_max * np.exp(-(test_theta**2))
-        chi2_test = np.array(
-            [
-                ff.chi2_MiniBooNE_2020_3p1(
-                    df_tot,
-                    test_umu4[k_test],
-                    on_shell=on_shell,
-                    v4i_f=v4i_f,
-                    v4i_def=v4i_def,
-                    vmu4_f=vmu4_f,
-                    vmu4_def=vmu4_def,
-                    l_decay_proper_cm=decay_l,
-                )
-                for k_test in range(n_test)
-            ]
-        )
-        mask = chi2_test < 0
-        chi2_test[mask] = 1e10
-        theta_guess = test_theta[chi2_test == chi2_test.min()].mean()
-        init_guess = np.array([theta_guess])
-
-        chi2 = lambda theta: ff.chi2_MiniBooNE_2020_3p1(
-            df_tot,
-            umu4_max * np.exp(-(theta**2)),
-            on_shell=on_shell,
-            v4i_f=v4i_f,
-            v4i_def=v4i_def,
-            vmu4_f=vmu4_f,
-            vmu4_def=vmu4_def,
-            l_decay_proper_cm=decay_l,
-        )
-
-        # 4. DO THE FITTING
-        res = scipy.optimize.minimize(chi2, init_guess)
-        umu4_bf = umu4_max * np.exp(-res.x[0] ** 2)
-        vmu4_bf = vmu4_f(umu4_bf)
         ###################################################################################################
 
         # 5. COMPUTE NUMBERS FROM THE BEST FIT
@@ -180,7 +200,7 @@ def fit_point_3p1(
         # 6. MAIN OUTPUT -- TOTAL RATE AND CHI2
 
         # Chi2 and total event rate
-        output = f"{mzprimes:.6e} {m4s:.6e} {sum_w_post_smearing:.6e} {vmu4_bf:.6e} {v4i_bf:.6e} {kwargs['epsilon']:.6e} {umu4_bf:.6e} {res.fun:.6e} {decay_l_bf:.6e} {(vmu4_bf/vmu4_def)**2 * sum_w_post_smearing:.6e} {sum_w_post_smearing_det / sum_w_post_smearing:.6e}\n"
+        output = f"{mzprimes:.6e} {m4s:.6e} {sum_w_post_smearing:.6e} {vmu4_bf:.6e} {v4i_bf:.6e} {kwargs['epsilon']:.6e} {umu4_bf:.6e} {y_min:.6e} {decay_l_bf:.6e} {(vmu4_bf/vmu4_def)**2 * sum_w_post_smearing:.6e} {sum_w_post_smearing_det / sum_w_post_smearing:.6e}\n"
         gf.save_to_locked_file(path + f"chi2_{i_line}.dat", output)
 
         ##############
