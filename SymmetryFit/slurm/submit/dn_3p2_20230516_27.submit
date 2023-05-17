@@ -1,0 +1,10 @@
+#!/bin/bash
+#SBATCH --job-name=dn_3p2_20230516_27
+#SBATCH --output=slurm/submit/dn_3p2_20230516_27.output
+#SBATCH --error=slurm/submit/dn_3p2_20230516_27.error
+
+#SBATCH --partition=defq
+#SBATCH --exclude=cn070
+
+jid0=($(sbatch slurm/submit/dn_3p2_20230516_28.submit))
+jid1=($(sbatch --dependency=afterok:${jid0[-1]} slurm/submit/merge-data_20230516_18.submit))

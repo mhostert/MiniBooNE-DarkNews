@@ -1,0 +1,52 @@
+#!/bin/bash
+#SBATCH --job-name=dn_3p2_20230516_24
+#SBATCH --output=slurm/output/dn_3p2_20230516_24.output
+#SBATCH --error=slurm/error/dn_3p2_20230516_24.error
+
+#SBATCH --partition=defq
+#SBATCH --exclude=cn070
+#SBATCH --ntasks 39
+#SBATCH --time=06:00:00
+#SBATCH --array=0-6
+
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 0 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 1 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 2 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 3 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 4 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 5 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 6 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 7 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 8 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 9 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 10 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 11 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 12 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 13 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 14 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 15 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 16 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 17 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 18 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 19 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 20 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 21 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 22 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 23 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 24 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 25 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 26 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 27 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 28 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 29 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 30 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 31 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 32 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 33 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 34 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 35 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 36 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 37 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 38 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+srun --ntasks=1 python fit_3p2_coupling.py --i_line $( expr "$SLURM_ARRAY_TASK_ID" '*' 40 '+' 39 ) --path results/3p2_coupling_0.01_delta_0.10/5m_16d_1h_22m_16s_ --cut circ1 --print_spectra 1 &
+wait

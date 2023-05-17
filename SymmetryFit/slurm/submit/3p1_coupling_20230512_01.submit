@@ -1,8 +1,0 @@
-#!/bin/bash
-#SBATCH --job-name=3p1_coupling_20230512_01
-#SBATCH --output=slurm/submit/3p1_coupling_20230512_01.output
-#SBATCH --error=slurm/submit/3p1_coupling_20230512_01.error
-
-#SBATCH --partition=defq
-
-jid0=($(sbatch slurm/submit/3p1_coupling_20230512_02.submit))

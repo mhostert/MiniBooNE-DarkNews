@@ -22,7 +22,7 @@ def slurm_submit(
     optional_args="",
     queue="defq",
     exclude="cn070",
-    timeout="03:00:00",
+    timeout="06:00:00",
 ):
     if queue == "debugq":
         print(

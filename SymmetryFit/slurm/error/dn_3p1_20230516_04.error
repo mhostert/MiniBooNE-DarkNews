@@ -1,0 +1,10 @@
+/home/mhostert/DarkNews/MiniBooNE-DarkNews/src/fastbnb/analysis.py:213: RuntimeWarning: invalid value encountered in double_scalars
+  df["reco_eff"] = w_selection.sum() / w.sum()
+/home/mhostert/DarkNews/MiniBooNE-DarkNews/src/fastbnb/analysis.py:213: RuntimeWarning: invalid value encountered in double_scalars
+  df["reco_eff"] = w_selection.sum() / w.sum()
+/home/mhostert/DarkNews/MiniBooNE-DarkNews/src/fastbnb/analysis.py:213: RuntimeWarning: invalid value encountered in double_scalars
+  df["reco_eff"] = w_selection.sum() / w.sum()
+/home/mhostert/DarkNews/MiniBooNE-DarkNews/src/fastbnb/analysis.py:213: RuntimeWarning: invalid value encountered in double_scalars
+  df["reco_eff"] = w_selection.sum() / w.sum()
+/home/mhostert/DarkNews/MiniBooNE-DarkNews/src/fastbnb/analysis.py:213: RuntimeWarning: invalid value encountered in double_scalars
+  df["reco_eff"] = w_selection.sum() / w.sum()

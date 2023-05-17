@@ -9,7 +9,6 @@ import slurm_tools
 """
 CUT = "circ1"  # "circ0" or "circ1" or "diag1" or "invmass"
 PRINT_SPECTRA = 1  # 0 -- do not print spectrum file or 1 -- print spectrum files (Enu, Evis, Cotheta, and invmass spectra.)
-EXPERIMENT = "miniboone_fhc"
 POINTS = 40
 NEVAL = int(1e5)
 
@@ -30,6 +29,8 @@ def sub3p1(EPSILON_CASE):
         "epsilon": EPSILON_CASE,
         "neval": NEVAL,
         "HNLtype": "dirac",
+        "nu_flavors": ["nu_mu", "nu_mu_bar"],
+        "noHF": True,
         "pandas": False,
         "parquet": False,
         "loglevel": "ERROR",
@@ -45,7 +46,10 @@ def sub3p1(EPSILON_CASE):
         "u_mu4",
         "chi2",
         "decay_length",
-        "N_events",
+        "MB_N_events",
+        "SBND_N_events",
+        "microB_N_events",
+        "ICARUS_N_events",
         "scatt_det",
     ]
     with open(unique_path + "chi2.dat", "w") as f:
@@ -71,7 +75,7 @@ def sub3p1(EPSILON_CASE):
         YGRID=YGRID,
         input_kwargs=kwargs,
         jobname="dn_3p1",
-        optional_args=f"--cut {CUT} --print_spectra {PRINT_SPECTRA} --experiment {EXPERIMENT}",
+        optional_args=f"--cut {CUT} --print_spectra {PRINT_SPECTRA}",
     )
 
 
@@ -91,6 +95,8 @@ def sub3p1_coupling(EPSILON_CASE):
         "epsilon": EPSILON_CASE,
         "neval": NEVAL,
         "HNLtype": "dirac",
+        "nu_flavors": ["nu_mu", "nu_mu_bar"],
+        "noHF": True,
         "pandas": False,
         "parquet": False,
         "loglevel": "ERROR",
@@ -99,15 +105,21 @@ def sub3p1_coupling(EPSILON_CASE):
     cols = [
         "mzprime",
         "m4",
-        "sum_w_post_smearing",
         "v_mu4",
         "v_4i",
         "epsilon",
         "u_mu4",
-        "chi2",
         "decay_length",
-        "N_events",
+        "chi2_mb_fhc",
+        "chi2_mb_rhc",
+        "chi2_mb_comb",
+        "mb_fhc_n_events",
+        "mb_rhc_n_events",
+        "sbnd_n_events",
+        "microb_n_events",
+        "icarus_n_events",
     ]
+
     with open(unique_path + "chi2.dat", "w") as f:
         # Header
         f.write("# " + " ".join(cols) + "\n")
@@ -119,7 +131,7 @@ def sub3p1_coupling(EPSILON_CASE):
     """
     points = POINTS  # NOTE: JobArray max size is 1001.
     mzvals = np.array(
-        [0.03, 0.1, 0.2, 0.5, 0.8, 1]
+        [0.03, 0.06, 0.1, 0.2, 0.5, 0.8, 1.25]
     )  # ---> This is fixed -- run for multiple plots
     m4vals = ff.round_sig(np.geomspace(0.01, 1.0, points), 4)
     XGRID, YGRID = np.meshgrid(m4vals, mzvals)
@@ -133,12 +145,14 @@ def sub3p1_coupling(EPSILON_CASE):
         YGRID=YGRID,
         input_kwargs=kwargs,
         jobname="dn_3p1",
-        optional_args=f"--cut {CUT} --print_spectra {PRINT_SPECTRA} --experiment {EXPERIMENT}",
+        queue="defq",
+        timeout="06:00:00",
+        optional_args=f"--cut {CUT} --print_spectra {PRINT_SPECTRA}",
     )
 
 
+sub3p1(EPSILON_CASE=1e-2)
 sub3p1(EPSILON_CASE=0.0008)
-# sub3p1(EPSILON_CASE=1e-3)
-sub3p1(EPSILON_CASE=1e-4)
-# sub3p1_coupling(EPSILON_CASE=1e-2)
-# sub3p1_coupling(EPSILON_CASE=8e-4)
+
+sub3p1_coupling(EPSILON_CASE=1e-2)
+sub3p1_coupling(EPSILON_CASE=8e-4)
