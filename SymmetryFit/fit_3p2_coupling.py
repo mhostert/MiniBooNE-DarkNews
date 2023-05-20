@@ -62,10 +62,12 @@ def fit_point_3p2(
     # 1. SIMULATIONS
     MB_fhc_df = GenLauncher(
         experiment="miniboone_fhc",
+        nu_flavors=["nu_mu"],
         **kwargs,
     ).run()
     MB_fhc_df_dirt = GenLauncher(
         experiment="miniboone_fhc_dirt",
+        nu_flavors=["nu_mu"],
         **kwargs,
     ).run()
     # 2. LIFETIME OF HNL
@@ -74,10 +76,12 @@ def fit_point_3p2(
 
     MB_rhc_df = GenLauncher(
         experiment="miniboone_rhc",
+        nu_flavors=["nu_mu_bar", "nu_mu"],
         **kwargs,
     ).run()
     MB_rhc_df_dirt = GenLauncher(
         experiment="miniboone_rhc_dirt",
+        nu_flavors=["nu_mu_bar", "nu_mu"],
         **kwargs,
     ).run()
     MB_rhc_df = pd.concat([MB_rhc_df, MB_rhc_df_dirt])
@@ -88,12 +92,14 @@ def fit_point_3p2(
         # simulation for SBN and SBN dirt
         sbn_df = GenLauncher(
             experiment=exp,
+            nu_flavors=["nu_mu"],
             **kwargs,
         ).run()
 
         # Run the generation for MiniBooNE Dirt
         sbn_df_dirt = GenLauncher(
             experiment=exp_dirt,
+            nu_flavors=["nu_mu"],
             **kwargs,
         ).run()
 

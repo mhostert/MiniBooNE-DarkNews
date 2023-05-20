@@ -13,7 +13,7 @@ POINTS = 40
 NEVAL = int(1e5)
 
 
-def sub3p1(EPSILON_CASE):
+def sub3p1(EPSILON_CASE, RATIO_CASE=0):
     RUN_PATH = f"results/3p1_general_{EPSILON_CASE}/"  # Path for this type of scan
     unique_path = slurm_tools.get_unique_path(RUN_PATH)
 
@@ -29,11 +29,12 @@ def sub3p1(EPSILON_CASE):
         "epsilon": EPSILON_CASE,
         "neval": NEVAL,
         "HNLtype": "dirac",
-        "nu_flavors": ["nu_mu", "nu_mu_bar"],
         "noHF": True,
         "pandas": False,
         "parquet": False,
         "loglevel": "ERROR",
+        "sparse": 2,
+        "ratio_tau_to_mu": RATIO_CASE,
     }
 
     cols = [
@@ -47,11 +48,11 @@ def sub3p1(EPSILON_CASE):
         "chi2",
         "decay_length",
         "MB_N_events",
-        "SBND_N_events",
-        "microB_N_events",
-        "ICARUS_N_events",
-        "scatt_det",
+        "eff_geometry",
+        "eff_selection",
+        "eff_total",
     ]
+
     with open(unique_path + "chi2.dat", "w") as f:
         # Header
         f.write("# " + " ".join(cols) + "\n")
@@ -75,6 +76,8 @@ def sub3p1(EPSILON_CASE):
         YGRID=YGRID,
         input_kwargs=kwargs,
         jobname="dn_3p1",
+        queue="defq",
+        timeout="1-00:00:00",
         optional_args=f"--cut {CUT} --print_spectra {PRINT_SPECTRA}",
     )
 
@@ -95,11 +98,11 @@ def sub3p1_coupling(EPSILON_CASE):
         "epsilon": EPSILON_CASE,
         "neval": NEVAL,
         "HNLtype": "dirac",
-        "nu_flavors": ["nu_mu", "nu_mu_bar"],
         "noHF": True,
         "pandas": False,
         "parquet": False,
         "loglevel": "ERROR",
+        "sparse": 2,
     }
 
     cols = [
@@ -146,13 +149,14 @@ def sub3p1_coupling(EPSILON_CASE):
         input_kwargs=kwargs,
         jobname="dn_3p1",
         queue="defq",
-        timeout="06:00:00",
+        timeout="1-00:00:00",
         optional_args=f"--cut {CUT} --print_spectra {PRINT_SPECTRA}",
     )
 
 
-sub3p1(EPSILON_CASE=1e-2)
-sub3p1(EPSILON_CASE=0.0008)
+sub3p1(EPSILON_CASE=1e-2, RATIO_CASE=10)
+# sub3p1(EPSILON_CASE=1e-2)
+# sub3p1(EPSILON_CASE=0.0008)
 
-sub3p1_coupling(EPSILON_CASE=1e-2)
-sub3p1_coupling(EPSILON_CASE=8e-4)
+# sub3p1_coupling(EPSILON_CASE=1e-2)
+# sub3p1_coupling(EPSILON_CASE=8e-4)

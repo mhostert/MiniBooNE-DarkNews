@@ -1,11 +1,10 @@
 import numpy as np
-import pandas as pd
 import argparse
 
+import DarkNews as dn
 from DarkNews.GenLauncher import GenLauncher
 from fastbnb import fit_functions as ff
 from fastbnb import grid_fit as gf
-from fastbnb import analysis
 from fastbnb import decayer
 
 n = 500
@@ -34,25 +33,29 @@ def fit_point_3p1(
     # 1. SIMULATIONS
     MB_fhc_df = GenLauncher(
         experiment="miniboone_fhc",
+        nu_flavors=["nu_mu"],
         **kwargs,
     ).run()
     MB_fhc_df_dirt = GenLauncher(
         experiment="miniboone_fhc_dirt",
+        nu_flavors=["nu_mu"],
         **kwargs,
     ).run()
     # 2. LIFETIME OF HNL
     dl = MB_fhc_df.attrs["N4_ctau0"]
-    MB_fhc_df = pd.concat([MB_fhc_df, MB_fhc_df_dirt])
+    MB_fhc_df = dn.MC.get_merged_MC_output(MB_fhc_df, MB_fhc_df_dirt)
 
     MB_rhc_df = GenLauncher(
         experiment="miniboone_rhc",
+        nu_flavors=["nu_mu_bar", "nu_mu"],
         **kwargs,
     ).run()
     MB_rhc_df_dirt = GenLauncher(
         experiment="miniboone_rhc_dirt",
+        nu_flavors=["nu_mu_bar", "nu_mu"],
         **kwargs,
     ).run()
-    MB_rhc_df = pd.concat([MB_rhc_df, MB_rhc_df_dirt])
+    MB_rhc_df = dn.MC.get_merged_MC_output(MB_rhc_df, MB_rhc_df_dirt)
 
     # sbn experiments
     sbn_dfs = []
@@ -60,16 +63,18 @@ def fit_point_3p1(
         # simulation for SBN and SBN dirt
         sbn_df = GenLauncher(
             experiment=exp,
+            nu_flavors=["nu_mu"],
             **kwargs,
         ).run()
 
         # Run the generation for MiniBooNE Dirt
         sbn_df_dirt = GenLauncher(
             experiment=exp_dirt,
+            nu_flavors=["nu_mu"],
             **kwargs,
         ).run()
 
-        sbn_dfs.append(pd.concat([sbn_df, sbn_df_dirt]))
+        sbn_dfs.append(dn.MC.get_merged_MC_output(sbn_df, sbn_df_dirt))
 
     # 3. CYCLE OVER DIFFERENT VALUES OF U_MU4
     v4i_def = kwargs["gD"] * kwargs["UD4"] * kwargs["Umu4"]

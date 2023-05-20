@@ -1,0 +1,10 @@
+#!/bin/bash
+#SBATCH --job-name=merge-data_20230518_12
+#SBATCH --output=slurm/output/merge-data_20230518_12.output
+#SBATCH --error=slurm/error/merge-data_20230518_12.error
+
+#SBATCH --partition=debugq
+#SBATCH --exclude=cn070
+
+srun --ntasks=1 --exclusive python file_merge.py results/3p2_general_delta_mz_1.25_eps_0.0008/5m_18d_20h_51m_20s_ &
+wait

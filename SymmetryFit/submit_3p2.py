@@ -18,12 +18,12 @@ def sub3p2(SCAN_TYPE, FIXED_MASS, EPSILON_CASE=1e-2):
         "gD": 2.0,
         "epsilon": EPSILON_CASE,
         "neval": NEVAL,
-        "nu_flavors": ["nu_mu", "nu_mu_bar"],
         "noHF": True,
         "HNLtype": "dirac",
         "pandas": False,
         "parquet": False,
         "loglevel": "ERROR",
+        "sparse": 2,
     }
 
     if SCAN_TYPE == "delta":
@@ -48,6 +48,9 @@ def sub3p2(SCAN_TYPE, FIXED_MASS, EPSILON_CASE=1e-2):
         "chi2",
         "decay_length",
         "N_events",
+        "eff_geometry",
+        "eff_selection",
+        "eff_final",
     ]
     with open(unique_path + "chi2.dat", "w") as f:
         # Header
@@ -78,7 +81,7 @@ def sub3p2(SCAN_TYPE, FIXED_MASS, EPSILON_CASE=1e-2):
         input_kwargs=kwargs,
         jobname="dn_3p2",
         queue="defq",
-        timeout="06:00:00",
+        timeout="1-00:00:00",
         optional_args=f"--cut {CUT} --print_spectra {PRINT_SPECTRA} --scan_type {SCAN_TYPE}",
     )
 
@@ -100,12 +103,12 @@ def sub3p2_coupling(EPSILON_CASE, DELTA_CASE):
         "gD": 2.0,
         "epsilon": EPSILON_CASE,
         "neval": NEVAL,
-        "nu_flavors": ["nu_mu", "nu_mu_bar"],
         "noHF": True,
         "HNLtype": "dirac",
         "pandas": False,
         "parquet": False,
         "loglevel": "ERROR",
+        "sparse": 2,
     }
 
     # We are adding this delta to kwargs, but it will be pop'ed by the fit function before being passed to DarkNews
@@ -155,14 +158,14 @@ def sub3p2_coupling(EPSILON_CASE, DELTA_CASE):
         input_kwargs=kwargs,
         jobname="dn_3p2",
         queue="defq",
-        timeout="06:00:00",
+        timeout="1-00:00:00",
         optional_args=f"--cut {CUT} --print_spectra {PRINT_SPECTRA}",
     )
 
 
-# sub3p2(SCAN_TYPE="mzprime", FIXED_MASS=0.015, EPSILON_CASE=1e-4)
-# sub3p2(SCAN_TYPE="mzprime", FIXED_MASS=0.150, EPSILON_CASE=1e-4)
-# sub3p2(SCAN_TYPE="mzprime", FIXED_MASS=0.250, EPSILON_CASE=1e-4)
+# # sub3p2(SCAN_TYPE="mzprime", FIXED_MASS=0.015, EPSILON_CASE=1e-4)
+# # sub3p2(SCAN_TYPE="mzprime", FIXED_MASS=0.150, EPSILON_CASE=1e-4)
+# # sub3p2(SCAN_TYPE="mzprime", FIXED_MASS=0.250, EPSILON_CASE=1e-4)
 
 sub3p2(SCAN_TYPE="mzprime", FIXED_MASS=0.015, EPSILON_CASE=8e-4)
 sub3p2(SCAN_TYPE="mzprime", FIXED_MASS=0.150, EPSILON_CASE=8e-4)

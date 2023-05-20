@@ -1,11 +1,11 @@
 import numpy as np
 import pandas as pd
 import scipy
-import sys
 import argparse
 
 from filelock import FileLock
 
+from DarkNews.MC import get_merged_MC_output
 from DarkNews.GenLauncher import GenLauncher
 
 from fastbnb import fit_functions as ff
@@ -65,13 +65,12 @@ def fit_point_3p2(
 
     # 1. PERFORM AND READ THE DATA FROM THE SIMULATION
     # Run the generation for MiniBooNE
-    df = GenLauncher(m5=m5s, m4=m4s, experiment="miniboone_fhc_dirt", **kwargs).run()
-    decay_l = df.attrs["N5_ctau0"]
-
+    df = GenLauncher(m5=m5s, m4=m4s, experiment="miniboone_fhc", **kwargs).run()
     # Run the generation for MiniBooNE Dirt
     df2 = GenLauncher(m5=m5s, m4=m4s, experiment="miniboone_fhc_dirt", **kwargs).run()
 
-    df_tot = pd.concat([df, df2])
+    df_tot = get_merged_MC_output(df, df2)
+    decay_l = df_tot.attrs["N5_ctau0"]
 
     ###########################
     # 3. DEFINE FUNCTIONS WITH/WITHOUT DIRT TO FIT
@@ -118,12 +117,20 @@ def fit_point_3p2(
     rescale = (vmu5_bf / vmu5_def) ** 2
     df_tot["w_event_rate"] *= rescale
     df_tot["reco_w"] *= rescale
+    df_tot["w_pre_decay"] *= rescale
 
     ##############
     # 6. MAIN OUTPUT -- TOTAL RATE AND CHI2
 
+    eff_selection = df_tot["reco_w"].sum() / df_tot["w_event_rate"].sum()
+
+    # Efficiency geometry before selection
+    eff_geometry = df_tot["w_event_rate"].sum() / df_tot["w_pre_decay"].sum()
+
+    eff_final = df_tot["reco_w"].sum() / df_tot["w_pre_decay"].sum()
+
     # Chi2 and total event rate
-    output = f"{mzprimes:.6e} {m5s:.6e} {m4s:.6e} {deltas:.6e} {sum_w_post_smearing:.6e} {vmu5_bf:.6e} {v54:.6e} {kwargs['epsilon']:.6e} {vmu5_bf / 2.:.6e} {res.fun:.6e} {decay_l:.6e} {(vmu5_bf / vmu5_def)**2 * sum_w_post_smearing:.6e}\n"
+    output = f"{mzprimes:.6e} {m5s:.6e} {m4s:.6e} {deltas:.6e} {sum_w_post_smearing:.6e} {vmu5_bf:.6e} {v54:.6e} {kwargs['epsilon']:.6e} {vmu5_bf / 2.:.6e} {res.fun:.6e} {decay_l:.6e} {(vmu5_bf / vmu5_def)**2 * sum_w_post_smearing:.6e} {eff_geometry:.6e} {eff_selection:.6e} {eff_final:.6e}\n"
     gf.save_to_locked_file(path + "chi2.dat", output)
 
     ##############

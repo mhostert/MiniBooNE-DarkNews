@@ -106,7 +106,7 @@ def slurm_submit(
     job_merge = SlurmJob(
         name="merge-data",
         executable="python",
-        extra_lines=[f"#SBATCH --partition={queue}", f"#SBATCH --exclude={exclude}"],
+        extra_lines=[f"#SBATCH --partition=debugq", f"#SBATCH --exclude={exclude}"],
         submit=submit,
         output=output,
         error=error,

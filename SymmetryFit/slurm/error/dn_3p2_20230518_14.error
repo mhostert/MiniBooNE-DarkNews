@@ -1,0 +1,74 @@
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p2_general.py", line 190, in <module>
+    fit_point_3p2(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p2_general.py", line 163, in fit_point_3p2
+    gf.save_to_locked_file(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/src/fastbnb/grid_fit.py", line 38, in save_to_locked_file
+    os.remove(lockfile_name)
+FileNotFoundError: [Errno 2] No such file or directory: 'results/3p2_general_delta_mz_1.25_eps_0.01/5m_18d_20h_51m_20s_invmass_spectrum.dat.lock'
+srun: error: cn027: task 0: Exited with exit code 1
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p2_general.py", line 190, in <module>
+    fit_point_3p2(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p2_general.py", line 134, in fit_point_3p2
+    gf.save_to_locked_file(path + "chi2.dat", output)
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/src/fastbnb/grid_fit.py", line 38, in save_to_locked_file
+    os.remove(lockfile_name)
+FileNotFoundError: [Errno 2] No such file or directory: 'results/3p2_general_delta_mz_1.25_eps_0.01/5m_18d_20h_51m_20s_chi2.dat.lock'
+srun: error: cn027: task 0: Exited with exit code 1
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p2_general.py", line 190, in <module>
+    fit_point_3p2(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p2_general.py", line 147, in fit_point_3p2
+    gf.save_to_locked_file(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/src/fastbnb/grid_fit.py", line 38, in save_to_locked_file
+    os.remove(lockfile_name)
+FileNotFoundError: [Errno 2] No such file or directory: 'results/3p2_general_delta_mz_1.25_eps_0.01/5m_18d_20h_51m_20s_evis_spectrum.dat.lock'
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p2_general.py", line 190, in <module>
+    fit_point_3p2(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p2_general.py", line 147, in fit_point_3p2
+    gf.save_to_locked_file(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/src/fastbnb/grid_fit.py", line 38, in save_to_locked_file
+    os.remove(lockfile_name)
+FileNotFoundError: [Errno 2] No such file or directory: 'results/3p2_general_delta_mz_1.25_eps_0.01/5m_18d_20h_51m_20s_evis_spectrum.dat.lock'
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p2_general.py", line 190, in <module>
+    fit_point_3p2(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p2_general.py", line 141, in fit_point_3p2
+    gf.save_to_locked_file(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/src/fastbnb/grid_fit.py", line 38, in save_to_locked_file
+    os.remove(lockfile_name)
+FileNotFoundError: [Errno 2] No such file or directory: 'results/3p2_general_delta_mz_1.25_eps_0.01/5m_18d_20h_51m_20s_enu_spectrum.dat.lock'
+srun: error: cn015: task 0: Exited with exit code 1
+srun: error: cn015: task 0: Exited with exit code 1
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p2_general.py", line 190, in <module>
+Traceback (most recent call last):
+  File "/home/mho    fit_point_3p2(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p2_general.py", line 155, in fit_point_3p2
+    gf.save_to_locked_file(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/src/fastbnb/grid_fit.py", line 38, in save_to_locked_file
+    os.remove(lockfile_name)
+FileNotFoundError: [Errno 2] No such file or directory: 'results/3p2_general_delta_mz_1.25_eps_0.01/5m_18d_20h_51m_20s_costheta_spectrum.dat.lock'
+esults/3p2_general_delta_mz_1.25_eps_0.01/5m_18d_20h_51m_20s_enu_spectrum.dat.lock'
+Traceback (most recent call last):
+  File "/home/mhoTraceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p2_general.py", line 190, in <module>
+    fit_point_3p2(
+  File "/home/mhostert/DarkNews/MiniB134, in fit_point_3p2
+    gf.save_to_locked_file(path + "chi2.dat", output)
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/src/fastbnb/grid_fit.py", line 38, in save_to_locked_file
+    os.remove(lockfile_name)
+FileNotFoundError: [Errno 2] No such file or directory: 'results/3p2_general_delta_mz_1.25_eps_0.01/5m_18d_20h_51m_20s_chi2.dat.lock'
+srun: error: cn022: task 0: Exited with exit code 1
+srun: error: cn022: task 0: Exited with exit code 1
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p2_general.py", line 190, in <module>
+    fit_point_3p2(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p2_general.py", line 134, in fit_point_3p2
+    gf.save_to_locked_file(path + "chi2.dat", output)
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/src/fastbnb/grid_fit.py", line 38, in save_to_locked_file
+    os.remove(lockfile_name)
+FileNotFoundError: [Errno 2] No such file or directory: 'results/3p2_general_delta_mz_1.25_eps_0.01/5m_18d_20h_51m_20s_chi2.dat.lock'
+srun: error: cn010: task 0: Exited with exit code 1
