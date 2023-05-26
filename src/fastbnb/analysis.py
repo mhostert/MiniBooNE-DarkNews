@@ -120,7 +120,7 @@ def apply_reco_efficiencies(Energy, w, exp="miniboone"):
 
 
 # Full analysis to get reconstructed energy spectrum for BNB experiments
-def reco_nueCCQElike_Enu(df, exp="miniboone", cut="circ1"):
+def reco_nueCCQElike_Enu(df, exp="miniboone", cut="circ1", clean_df=False):
     """compute_spectrum _summary_
 
     Parameters
@@ -134,10 +134,10 @@ def reco_nueCCQElike_Enu(df, exp="miniboone", cut="circ1"):
             for photons:
                 'photon' assumes this is a photon and therefore always a single shower
             for lepton pairs:
-                'asymmetric' picks events where one of the leptons (independent of charge) is below a hard threshold
-                'overlapping' picks events where the two leptons are overlapping
-                'both' for *either* asymmetric or overlapping condition to be true
-                'separated' picks events where both leptons are above threshold and non-overlapping by default 'asymmetric'
+                circ0, circ1, diag -- corresponding to Kelly&Kopp criteria
+                invmass -- corresponding to invmass criteria from Patterson
+    clean_df : bool, optional
+        whether to remove rejected events from the dataframe, by default False
 
     Returns
     -------
@@ -210,7 +210,10 @@ def reco_nueCCQElike_Enu(df, exp="miniboone", cut="circ1"):
     df["reco_costheta_beam"] = costheta
     df["reco_eff"] = w_selection.sum() / w.sum()
 
-    return df
+    if clean_df:
+        return df[df.reco_w > 0]
+    else:
+        return df
 
 
 # Full analysis to get reconstructed energy spectrum for BNB experiments

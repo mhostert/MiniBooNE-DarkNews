@@ -70,7 +70,10 @@ dif_z_icarus = 1e2
 def get_angle(p1, p2):
     x1, y1, z1 = p1
     x2, y2, z2 = p2
-    return np.arccos((x1 * x2 + y1 * y2 + z1 * z2) / (np.sqrt(x1 * x1 + y1 * y1 + z1 * z1) * np.sqrt(x2 * x2 + y2 * y2 + z2 * z2)))
+    return np.arccos(
+        (x1 * x2 + y1 * y2 + z1 * z2)
+        / (np.sqrt(x1 * x1 + y1 * y1 + z1 * z1) * np.sqrt(x2 * x2 + y2 * y2 + z2 * z2))
+    )
 
 
 def dot3(p1, p2):
@@ -94,7 +97,11 @@ def rotate_by_theta(v, k, theta):
     k = normalize_3D_vec(k)
 
     # Rodrigues' rotation formula
-    return np.cos(theta) * v + np.sin(theta) * cross3(k, v) + dot3(k, v) * (1 - np.cos(theta)) * k
+    return (
+        np.cos(theta) * v
+        + np.sin(theta) * cross3(k, v)
+        + dot3(k, v) * (1 - np.cos(theta)) * k
+    )
 
 
 # rotate a 4D-vector v using the same minimum rotation to take vector a into vector b
@@ -123,12 +130,23 @@ def get_3direction(p0):
 
 
 def rotate_dataframe(df):
-    particles = ["P_target", "P_recoil", "P_decay_N_parent", "P_decay_ell_plus", "P_decay_ell_minus", "P_decay_N_daughter", "P_decay_photon", "P_projectile"]
+    particles = [
+        "P_target",
+        "P_recoil",
+        "P_decay_N_parent",
+        "P_decay_ell_plus",
+        "P_decay_ell_minus",
+        "P_decay_N_daughter",
+        "P_decay_photon",
+        "P_projectile",
+    ]
 
     for particle in particles:
         try:
             df.loc[:, (particle, ["1", "2", "3"])] = rotate_similar_to(
-                df[particle].values.T[1:], df.P_projectile.values.T[1:], df.pos_scatt.values.T[1:] - df["pos_prod"].values.T
+                df[particle].values.T[1:],
+                df.P_projectile.values.T[1:],
+                df.pos_scatt.values.T[1:] - df["pos_prod"].values.T,
             ).T
         except:
             continue
@@ -202,11 +220,28 @@ def get_distances(p0, phat, experiment):
 
     # positions of the 6 walls of the cryostat in order (2 for X, 2 for Y, 2 for Z)
     if experiment == "microboone" or experiment == "microboone_dirt":
-        planes = np.array([-x_muB / 2, x_muB / 2, -y_muB / 2, y_muB / 2, -z_muB / 2, z_muB / 2])
-    elif experiment == "sbnd" or experiment == "sbnd_dirt" or experiment == "sbnd_dirt_cone":
-        planes = np.array([-x_sbnd / 2, x_sbnd / 2, -y_sbnd / 2, y_sbnd / 2, -z_sbnd / 2, z_sbnd / 2])
+        planes = np.array(
+            [-x_muB / 2, x_muB / 2, -y_muB / 2, y_muB / 2, -z_muB / 2, z_muB / 2]
+        )
+    elif (
+        experiment == "sbnd"
+        or experiment == "sbnd_dirt"
+        or experiment == "sbnd_dirt_cone"
+    ):
+        planes = np.array(
+            [-x_sbnd / 2, x_sbnd / 2, -y_sbnd / 2, y_sbnd / 2, -z_sbnd / 2, z_sbnd / 2]
+        )
     elif experiment == "icarus" or experiment == "icarus_dirt":
-        planes = np.array([-x_icarus / 2, x_icarus / 2, -y_icarus / 2, y_icarus / 2, -z_icarus / 2, z_icarus / 2])
+        planes = np.array(
+            [
+                -x_icarus / 2,
+                x_icarus / 2,
+                -y_icarus / 2,
+                y_icarus / 2,
+                -z_icarus / 2,
+                z_icarus / 2,
+            ]
+        )
 
     # suitable forms for parameters
     p0_6 = np.array([p0[0], p0[0], p0[1], p0[1], p0[2], p0[2]]).T
@@ -214,15 +249,29 @@ def get_distances(p0, phat, experiment):
 
     # find solutions and intersections of P0 + phat*t = planes, for parameter t
     solutions = (planes - p0_6) / phat_6
-    intersections = [[p0[:, i] + solutions[i, j] * phat[:, i] for j in range(6)] for i in range(n)]
+    intersections = [
+        [p0[:, i] + solutions[i, j] * phat[:, i] for j in range(6)] for i in range(n)
+    ]
 
     # create a mask with invalid intersections
     mask_inter = np.array(
         [
             [
-                (planes[0] - precision <= intersections[i][j][0] <= planes[1] + precision)
-                & (planes[2] - precision <= intersections[i][j][1] <= planes[3] + precision)
-                & (planes[4] - precision <= intersections[i][j][2] <= planes[5] + precision)
+                (
+                    planes[0] - precision
+                    <= intersections[i][j][0]
+                    <= planes[1] + precision
+                )
+                & (
+                    planes[2] - precision
+                    <= intersections[i][j][1]
+                    <= planes[3] + precision
+                )
+                & (
+                    planes[4] - precision
+                    <= intersections[i][j][2]
+                    <= planes[5] + precision
+                )
                 & (solutions[i, j] > -precision)
                 for j in range(6)
             ]
@@ -315,10 +364,14 @@ def decay_selection(df, l_decay_proper_cm, experiment, weights="w_event_rate"):
         dist2 = -x0_dot_p + np.sqrt(discriminant)
 
         # prob of decay inside the fiducial vol
-        probabilities = expon.cdf(dist2, 0, l_decay_lab_cm) - expon.cdf(dist1, 0, l_decay_lab_cm)
+        probabilities = expon.cdf(dist2, 0, l_decay_lab_cm) - expon.cdf(
+            dist1, 0, l_decay_lab_cm
+        )
 
         # in this method, no well-defined decay position, so we take the mean of entry and exit points
-        df.loc[:, ("pos_decay", "0")] = df["pos_scatt", "0"] + (dist2 + dist1) / 2 / const.c_LIGHT / get_beta(pN[mask_in_detector])
+        df.loc[:, ("pos_decay", "0")] = df["pos_scatt", "0"] + (
+            dist2 + dist1
+        ) / 2 / const.c_LIGHT / get_beta(pN[mask_in_detector])
         df.loc[:, ("pos_decay", "1")] = p0[0] + (dist2 + dist1) / 2 * phat[0]
         df.loc[:, ("pos_decay", "2")] = p0[1] + (dist2 + dist1) / 2 * phat[1]
         df.loc[:, ("pos_decay", "3")] = p0[2] + (dist2 + dist1) / 2 * phat[2]
@@ -329,10 +382,14 @@ def decay_selection(df, l_decay_proper_cm, experiment, weights="w_event_rate"):
         dist1, dist2 = get_distances(p0, phat, experiment).T
 
         # prob of decay inside the fiducial vol
-        probabilities = expon.cdf(dist2, 0, l_decay_lab_cm) - expon.cdf(dist1, 0, l_decay_lab_cm)
+        probabilities = expon.cdf(dist2, 0, l_decay_lab_cm) - expon.cdf(
+            dist1, 0, l_decay_lab_cm
+        )
 
         # in this method, no well-defined decay position, so we take the mean of entry and exit points
-        df["pos_decay", "0"] = df["pos_scatt", "0"] + (dist2 + dist1) / 2 / const.c_LIGHT / get_beta(pN)
+        df["pos_decay", "0"] = df["pos_scatt", "0"] + (
+            dist2 + dist1
+        ) / 2 / const.c_LIGHT / get_beta(pN)
         df["pos_decay", "1"] = df["pos_scatt", "1"] + (dist2 + dist1) / 2 * phat[0]
         df["pos_decay", "2"] = df["pos_scatt", "2"] + (dist2 + dist1) / 2 * phat[1]
         df["pos_decay", "3"] = df["pos_scatt", "3"] + (dist2 + dist1) / 2 * phat[2]
@@ -351,8 +408,20 @@ def set_params(df, showers="e+e-"):
     df = df.copy(deep=True)
 
     if showers == "e+e-":
-        p21 = np.array([df[("P_decay_ell_minus", "1")].values, df[("P_decay_ell_minus", "2")].values, df[("P_decay_ell_minus", "3")].values])
-        p22 = np.array([df[("P_decay_ell_plus", "1")].values, df[("P_decay_ell_plus", "2")].values, df[("P_decay_ell_plus", "3")].values])
+        p21 = np.array(
+            [
+                df[("P_decay_ell_minus", "1")].values,
+                df[("P_decay_ell_minus", "2")].values,
+                df[("P_decay_ell_minus", "3")].values,
+            ]
+        )
+        p22 = np.array(
+            [
+                df[("P_decay_ell_plus", "1")].values,
+                df[("P_decay_ell_plus", "2")].values,
+                df[("P_decay_ell_plus", "3")].values,
+            ]
+        )
         p2 = (p21 + p22) / 2
 
         p1 = np.array([0, 0, 1])
@@ -360,16 +429,28 @@ def set_params(df, showers="e+e-"):
 
         df["reco_theta_beam"] = angle * 180 / np.pi
 
-        df["reco_Evis"] = df[("P_decay_ell_minus", "0")].values + df[("P_decay_ell_plus", "0")].values
+        df["reco_Evis"] = (
+            df[("P_decay_ell_minus", "0")].values + df[("P_decay_ell_plus", "0")].values
+        )
 
         df["reco_w"] = df.w_event_rate
 
-        df["reco_Enu"] = const.m_proton * (df["reco_Evis"]) / (const.m_proton - (df["reco_Evis"]) * (1.0 - np.cos(angle)))
+        df["reco_Enu"] = (
+            const.m_proton
+            * (df["reco_Evis"])
+            / (const.m_proton - (df["reco_Evis"]) * (1.0 - np.cos(angle)))
+        )
 
         return df
 
     elif showers == "photon":
-        p2 = np.array([df[("P_decay_photon", "1")].values, df[("P_decay_photon", "2")].values, df[("P_decay_photon", "3")].values])
+        p2 = np.array(
+            [
+                df[("P_decay_photon", "1")].values,
+                df[("P_decay_photon", "2")].values,
+                df[("P_decay_photon", "3")].values,
+            ]
+        )
 
         p1 = np.array([0, 0, 1])
         angle = get_angle(p1, p2)
@@ -380,7 +461,11 @@ def set_params(df, showers="e+e-"):
 
         df["reco_w"] = df.w_event_rate
 
-        df["reco_Enu"] = const.m_proton * (df["reco_Evis"]) / (const.m_proton - (df["reco_Evis"]) * (1.0 - np.cos(angle)))
+        df["reco_Enu"] = (
+            const.m_proton
+            * (df["reco_Evis"])
+            / (const.m_proton - (df["reco_Evis"]) * (1.0 - np.cos(angle)))
+        )
 
         return df
 
@@ -388,8 +473,20 @@ def set_params(df, showers="e+e-"):
 def filter_angle_ee(df, angle_max=5):
     df = df.copy(deep=True)
 
-    p1 = np.array([df[("P_decay_ell_minus", "1")].values, df[("P_decay_ell_minus", "2")].values, df[("P_decay_ell_minus", "3")].values])
-    p2 = np.array([df[("P_decay_ell_plus", "1")].values, df[("P_decay_ell_plus", "2")].values, df[("P_decay_ell_plus", "3")].values])
+    p1 = np.array(
+        [
+            df[("P_decay_ell_minus", "1")].values,
+            df[("P_decay_ell_minus", "2")].values,
+            df[("P_decay_ell_minus", "3")].values,
+        ]
+    )
+    p2 = np.array(
+        [
+            df[("P_decay_ell_plus", "1")].values,
+            df[("P_decay_ell_plus", "2")].values,
+            df[("P_decay_ell_plus", "3")].values,
+        ]
+    )
 
     angle_ee = get_angle(p1, p2)
     df["angle_ee"] = angle_ee * 180 / np.pi
@@ -449,8 +546,20 @@ def out_of_active_volume(df, experiment="microboone"):
 def set_opening_angle(df):
     df = df.copy(deep=True)
 
-    p1 = np.array([df[("P_decay_ell_minus", "1")].values, df[("P_decay_ell_minus", "2")].values, df[("P_decay_ell_minus", "3")].values])
-    p2 = np.array([df[("P_decay_ell_plus", "1")].values, df[("P_decay_ell_plus", "2")].values, df[("P_decay_ell_plus", "3")].values])
+    p1 = np.array(
+        [
+            df[("P_decay_ell_minus", "1")].values,
+            df[("P_decay_ell_minus", "2")].values,
+            df[("P_decay_ell_minus", "3")].values,
+        ]
+    )
+    p2 = np.array(
+        [
+            df[("P_decay_ell_plus", "1")].values,
+            df[("P_decay_ell_plus", "2")].values,
+            df[("P_decay_ell_plus", "3")].values,
+        ]
+    )
 
     angle_ee = get_angle(p1, p2)
     df["opening_angle"] = angle_ee * 180 / np.pi

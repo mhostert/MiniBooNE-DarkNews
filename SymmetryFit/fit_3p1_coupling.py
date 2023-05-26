@@ -7,7 +7,16 @@ from fastbnb import fit_functions as ff
 from fastbnb import grid_fit as gf
 from fastbnb import decayer
 
-n = 500
+NCOUPLING_POINTS = 200
+UMU4_RANGES = {
+    0.03: (1e-11, 1e-4),
+    0.06: (1e-11, 1e-3),
+    0.1: (1e-11, 1e-5),
+    0.2: (1e-10, 1e-4),
+    0.5: (1e-8, 1e-2),
+    0.8: (1e-8, 1e-2),
+    1.25: (1e-8, 1e-1),
+}
 SBN_experiments = ["microboone", "icarus", "sbnd"]
 SBN_experiments_dirt = ["microboone_dirt", "icarus_dirt", "sbnd_dirt_cone"]
 
@@ -26,9 +35,26 @@ def fit_point_3p1(
     kwargs["m4"] = m4s
     kwargs["mzprime"] = mzprimes
 
-    umu4 = np.geomspace(1e-5, 0.5, n)
-    vmu4 = kwargs["gD"] * kwargs["UD4"] * kwargs["UD4"] * umu4 / np.sqrt(1 - umu4**2)
-    v4i = kwargs["gD"] * kwargs["UD4"] * umu4
+    if "ratio_tau_to_mu" in kwargs.keys():
+        ratio_tau_to_mu = kwargs.pop("ratio_tau_to_mu")
+    else:
+        ratio_tau_to_mu = 0
+    kwargs["Utau4"] = ratio_tau_to_mu * kwargs["Umu4"]
+
+    rescale = 8e-4 / kwargs["epsilon"]
+    umu4 = np.geomspace(
+        np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale,
+        min(np.sqrt(UMU4_RANGES[mzprimes][1]) * rescale / (1 + ratio_tau_to_mu), 0.25),
+        NCOUPLING_POINTS,
+    )
+    vmu4 = (
+        kwargs["gD"]
+        * kwargs["UD4"]
+        * kwargs["UD4"]
+        * umu4
+        / np.sqrt(1 - umu4**2 * (1 + ratio_tau_to_mu**2))
+    )
+    v4i = kwargs["gD"] * kwargs["UD4"] * np.sqrt(umu4**2 * (1 + ratio_tau_to_mu**2))
 
     # 1. SIMULATIONS
     MB_fhc_df = GenLauncher(
@@ -77,16 +103,20 @@ def fit_point_3p1(
         sbn_dfs.append(dn.MC.get_merged_MC_output(sbn_df, sbn_df_dirt))
 
     # 3. CYCLE OVER DIFFERENT VALUES OF U_MU4
-    v4i_def = kwargs["gD"] * kwargs["UD4"] * kwargs["Umu4"]
+    v4i_def = (
+        kwargs["gD"]
+        * kwargs["UD4"]
+        * np.sqrt(kwargs["Umu4"] ** 2 * (1 + ratio_tau_to_mu**2))
+    )
     vmu4_def = (
         kwargs["gD"]
         * kwargs["UD4"]
         * kwargs["UD4"]
         * kwargs["Umu4"]
-        / np.sqrt(1 - kwargs["Umu4"] ** 2)
+        / np.sqrt(1 - kwargs["Umu4"] ** 2 * (1 + ratio_tau_to_mu**2))
     )
 
-    for j in range(n):
+    for j in range(NCOUPLING_POINTS):
         decay_l = dl / (v4i[j] / v4i_def) ** 2
 
         ##############

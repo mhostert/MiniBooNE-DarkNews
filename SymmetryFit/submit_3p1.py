@@ -14,12 +14,15 @@ NEVAL = int(1e5)
 
 
 def sub3p1(EPSILON_CASE, RATIO_CASE=0):
-    RUN_PATH = f"results/3p1_general_{EPSILON_CASE}/"  # Path for this type of scan
+    if RATIO_CASE == 0:
+        RUN_PATH = f"results/3p1_general_{EPSILON_CASE}/"  # Path for this type of scan
+    else:
+        RUN_PATH = f"results/3p1_general_{EPSILON_CASE}_utauratio_{RATIO_CASE}/"  # Path for this type of scan
     unique_path = slurm_tools.get_unique_path(RUN_PATH)
 
     ####################################################
     """
-        Now some parameters for the event generation. 
+        Now some parameters for the event generation.
         This is saved to file and then loaded by the fitting script.
     """
     kwargs = {
@@ -76,14 +79,17 @@ def sub3p1(EPSILON_CASE, RATIO_CASE=0):
         YGRID=YGRID,
         input_kwargs=kwargs,
         jobname="dn_3p1",
-        queue="defq",
-        timeout="1-00:00:00",
+        queue="debugq",
+        timeout="0-01:00:00",
         optional_args=f"--cut {CUT} --print_spectra {PRINT_SPECTRA}",
     )
 
 
-def sub3p1_coupling(EPSILON_CASE):
-    RUN_PATH = f"results/3p1_coupling_{EPSILON_CASE}/"  # Path for this type of scan
+def sub3p1_coupling(EPSILON_CASE, RATIO_CASE=0):
+    if RATIO_CASE == 0:
+        RUN_PATH = f"results/3p1_coupling_{EPSILON_CASE}/"  # Path for this type of scan
+    else:
+        RUN_PATH = f"results/3p1_coupling_{EPSILON_CASE}_utauratio_{RATIO_CASE}/"  # Path for this type of scan
     unique_path = slurm_tools.get_unique_path(RUN_PATH)
 
     ####################################################
@@ -92,7 +98,7 @@ def sub3p1_coupling(EPSILON_CASE):
         This is saved to file and then loaded by the fitting script.
     """
     kwargs = {
-        "Umu4": np.sqrt(1.0e-12),
+        "Umu4": np.sqrt(1.0e-6),
         "UD4": 1.0 / np.sqrt(2.0),
         "gD": 2.0,
         "epsilon": EPSILON_CASE,
@@ -103,6 +109,7 @@ def sub3p1_coupling(EPSILON_CASE):
         "parquet": False,
         "loglevel": "ERROR",
         "sparse": 2,
+        "ratio_tau_to_mu": RATIO_CASE,
     }
 
     cols = [
@@ -148,15 +155,16 @@ def sub3p1_coupling(EPSILON_CASE):
         YGRID=YGRID,
         input_kwargs=kwargs,
         jobname="dn_3p1",
-        queue="defq",
-        timeout="1-00:00:00",
+        queue="debugq",
+        timeout="0-01:00:00",
         optional_args=f"--cut {CUT} --print_spectra {PRINT_SPECTRA}",
     )
 
 
-sub3p1(EPSILON_CASE=1e-2, RATIO_CASE=10)
+# sub3p1(EPSILON_CASE=0.0008, RATIO_CASE=40)
 # sub3p1(EPSILON_CASE=1e-2)
 # sub3p1(EPSILON_CASE=0.0008)
 
 # sub3p1_coupling(EPSILON_CASE=1e-2)
 # sub3p1_coupling(EPSILON_CASE=8e-4)
+sub3p1_coupling(EPSILON_CASE=1e-2, RATIO_CASE=40)

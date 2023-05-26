@@ -49,7 +49,11 @@ def fit_point_3p1(
     ###########################
     # 3. DEFINE FUNCTIONS WITH/WITHOUT DIRT TO FIT
     # The coupling vertex based on the parameters of the simulation
-    v4i_def = kwargs["gD"] * kwargs["UD4"] * kwargs["Umu4"] * (1 + ratio_tau_to_mu)
+    v4i_def = (
+        kwargs["gD"]
+        * kwargs["UD4"]
+        * np.sqrt(kwargs["Umu4"] ** 2 * (1 + ratio_tau_to_mu**2))
+    )
     vmu4_def = (
         kwargs["gD"]
         * kwargs["UD4"]

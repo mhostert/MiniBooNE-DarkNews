@@ -23,4 +23,4 @@ print("p-value   \t" + "\t".join(["%1.5f" % (1 - ci) for ci in conf_int]))
 
 for d in dof:
     chi_squared = [scipy.stats.chi2.ppf(ci, d) for ci in conf_int]
-    print("chi2(k=%1.2f)\t" % d + "\t".join(["%1.2f" % c for c in chi_squared]))
+    print("chi2(k=%1.2f)\t" % d + ", ".join(["%1.2f" % c for c in chi_squared]))

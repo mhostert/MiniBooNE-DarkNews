@@ -1,0 +1,449 @@
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.03
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.03
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.03
+    fit_point_3p1(
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.03
+KeyError: 0.03
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.03
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.03
+KeyError: 0.03
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.03
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.03
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.03
+KeyError: 0.03
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.03
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.03
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    fit_point_3p1(
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.03
+KeyError: 0.03
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.03
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.03
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.03
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.03
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.03
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.03
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, arkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+srun: error: cn073: task 0: Exited with exit code 1
+srun: error: cn073: task 0: Exited with exit code 1
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+    fit_point_3p1(
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.1
+KeyError: 0.1
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.1
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.1
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+    fit_point_3p1(
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGESTraceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.8
+    fit_point_3p1(
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.8
+KeyError: 0.8
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.8
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.8
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+    fit_point_3p1(
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.8
+KeyError: 0.8
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+    fit_point_3p1(
+KeyError: 0.8
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.8
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.8
+    fit_point_3p1(
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.8
+KeyError: 0.8
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.8
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.8
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.8
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.8
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.8
+    fit_point_3p1(
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.8
+KeyError: 0.8
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.8
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.8
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.8
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/Sympling.py", line 207, in <module>
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.03
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.03
+srun: error: cn072: task 0: Exited with exit code 1
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.03
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+                                                                                                        srun: error: cn072: task 0: Exited with exit code 1
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+srun: error: cn072: task 0: Exited with exit code 1
+                           fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.03
+                                                                                                                                                                                                                                                                                                                                                                                    srun: error: cn072: task 0: Exited with exit code 1
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.03
+srun: error: cn072: task 0: Exited with exit code 1
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+              srun: error: cn072: task 0: Exited with exit code 1
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.03
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     srun: error: cn072: task 0: Exited with exit code 1
+                                                    srun: error: cn072: task 0: Exited with exit code 1
+srun: error: cn074: task 0: Exited with exit code 1
+"/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.8
+KeyError: 0.8
+srun: error: cn073: task 0: Exited with exit code 1
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.8
+                                                                                                                                                                                                                                                                                                                                                                                                                  srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+                                                                                                                                                                                                                                                                                                                        srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+                                                    Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+                                                                                                                      srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+Traceback (most recent call last):
+srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.8
+srun: error: cn017: task 0: Exited with exit code 1
+Traceback (most recent call last):
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 207, in <module>
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.8
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.8
+srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+    fit_point_3p1(
+  File "/home/mhostert/DarkNews/MiniBooNE-DarkNews/SymmetryFit/fit_3p1_coupling.py", line 46, in fit_point_3p1
+    np.sqrt(UMU4_RANGES[mzprimes][0]) * rescale / (1 + ratio_tau_to_mu),
+KeyError: 0.8
+srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn074: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1
+srun: error: cn017: task 0: Exited with exit code 1

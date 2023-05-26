@@ -1,0 +1,10 @@
+#!/bin/bash
+#SBATCH --job-name=merge-data_20230525_01
+#SBATCH --output=slurm/output/merge-data_20230525_01.output
+#SBATCH --error=slurm/error/merge-data_20230525_01.error
+
+#SBATCH --partition=debugq
+#SBATCH --exclude=cn070
+
+srun --ntasks=1 --exclusive python file_merge.py results/3p1_coupling_0.01_utauratio_40/5m_25d_0h_6m_25s_ &
+wait
