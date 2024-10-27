@@ -51,9 +51,7 @@ def miniboone_reco_eff_func():
         ]
     )
     enu_c = enu[:-1] + (enu[1:] - enu[:-1]) / 2
-    return interp1d(
-        enu_c, eff, fill_value=(eff[0], eff[-1]), bounds_error=False, kind="nearest"
-    )
+    return interp1d(enu_c, eff, fill_value=(eff[0], eff[-1]), bounds_error=False, kind="nearest")
 
 
 # NOTE: This function is not used in the paper.
@@ -135,7 +133,8 @@ def reco_nueCCQElike_Enu(df, exp="miniboone", cut="circ1", clean_df=False):
                 'photon' assumes this is a photon and therefore always a single shower
             for lepton pairs:
                 circ0, circ1, diag -- corresponding to Kelly&Kopp criteria
-                invmass -- corresponding to invmass criteria from Patterson
+                invmass -- criterion imposed by hand. Corresponding to invmass criteria from Patterson
+                byhand -- criterion imposed by hand. No mee cut.
     clean_df : bool, optional
         whether to remove rejected events from the dataframe, by default False
 
@@ -180,26 +179,26 @@ def reco_nueCCQElike_Enu(df, exp="miniboone", cut="circ1", clean_df=False):
         pep = fastmc.smear_samples(df["P_decay_photon_1"], exp=exp)
         pem = fastmc.smear_samples(df["P_decay_photon_2"], exp=exp)
 
-        # kinetic energy of e+e-
+        # kinetic energy of gamma-gamma pair
         Evis = pep[:, 0] + pem[:, 0]
 
-        # angle wrt the beam direction using the sum of e+e-
+        # angle wrt the beam direction using the sum of gamma-gamma
         costheta = Cfv.get_cosTheta(pep + pem)
 
         # Evis, theta_beam, w, eff_s = signal_events(pep, pem, Delta_costheta, costhetaep, costhetaem, w, threshold=ep.THRESHOLD[exp], angle_max=ep.ANGLE_MAX[exp], event_type=event_type)
         w_preselection = apply_pre_selection(w, pep, pem, kind="nueCCQElike", cut=cut)
     else:
-        toy_logger.error(
-            f"Could not find pre-selection for the events in DataFrame columns: {df.columns}"
-        )
+        toy_logger.error(f"Could not find pre-selection for the events in DataFrame columns: {df.columns}")
 
     # Applies analysis cuts on the surviving LEE candidate events
-    w_selection = apply_final_LEEselection(Evis, costheta, w_preselection, exp=exp)
+    # skipping the Evis cut as it is included in the reco efficiencies provided by the collaboration
+    w_selection = w_preselection  # apply_final_LEEselection(Evis, costheta, w_preselection, exp=exp)
 
     # Compute reconsructed neutrino energy
     reco_enu = fastmc.reco_EnuCCQE(Evis, costheta)
 
-    w_selection = apply_reco_efficiencies(Evis, w_selection, exp=exp)
+    FIDUCIAL_MASS_CORRECTION = 1 / 0.55  # Undo the 55%-efficiency fiducial mass cut already included in the reco effs
+    w_selection = apply_reco_efficiencies(Evis, w_selection, exp=exp) * FIDUCIAL_MASS_CORRECTION
 
     ############################################################################
     # return reco observables of LEE
@@ -287,7 +286,8 @@ def apply_pre_selection(w, pep, pem, kind="nueCCQElike", cut="circ1"):
         *   'circ1' picks events based on Kelly&Kopp criteria: r = sqrt( (1 - CosTheta)^2/4 + (1 - Emax/Etot)^2 )
         *   'circ0' picks events based on Kelly&Kopp criteria: r = sqrt( (1 + CosTheta)^2/4 + (Emax/Etot)^2 )
         *   'diag' picks events based on Kelly&Kopp criteria: r = 1 - 1/2*((1 + CosTheta)/2 + Emax/Etot)
-        *   'invmass' picks events based on invmass criteria from Patterson, assuming m_ee is correctly reconstructed.
+        *   'invmass' picks events based on overlapping = (theta < 13) and asymmetric = (Evis < 30 MeV). Cuts on true invmass from Patterson.
+        *   'byhand' picks events based on overlapping = (theta < 13) and asymmetric = (Evis < 30 MeV). No mee cut implemented.
 
     Returns
     -------
@@ -315,11 +315,15 @@ def apply_pre_selection(w, pep, pem, kind="nueCCQElike", cut="circ1"):
     elif cut == "invmass":
         mee = Cfv.inv_mass(pep + pem, pep + pem)
         ovl = Delta_costheta < np.cos(13 * np.pi / 180)
-        asy = ((pep[:, 0] < 0.03) & (pem[:, 0] > 0.03)) | (
-            (pem[:, 0] < 0.03) & (pep[:, 0] > 0.03)
-        )
+        asy = ((pep[:, 0] < 0.03) & (pem[:, 0] > 0.03)) | ((pem[:, 0] < 0.03) & (pep[:, 0] > 0.03))
         OldCut = ovl | asy
         condition = (mee < fastmc.mee_cut_func(Evis)) * OldCut
+
+    elif cut == "byhand":
+        ovl = Delta_costheta > np.cos(13 * np.pi / 180)
+        asy = ((pep[:, 0] < 0.03) & (pem[:, 0] > 0.03)) | ((pem[:, 0] < 0.03) & (pep[:, 0] > 0.03))
+        condition = ovl | asy
+
     else:
         toy_logger.error(f"Could not identify pre-selection cuts for kind {kind}")
 

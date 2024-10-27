@@ -12,7 +12,10 @@ THRESHOLD = {"miniboone": 0.03, "microboone": 0.01}
 ANGLE_MAX = {"miniboone": 13.0, "microboone": 5.0}
 ENU_MIN = {"miniboone": 0.14, "microboone": 0.100}
 ENU_MAX = {"miniboone": 1.5, "microboone": 3.0}
-EVIS_MIN = {"miniboone": 0.14, "microboone": 0.100}
+EVIS_MIN = {
+    "miniboone": 0.100,  # to apply eff form 2012 data release needs to start from 100 MeV
+    "microboone": 0.100,
+}
 EVIS_MAX = {"miniboone": 3.0, "microboone": 3.0}
 
 # Resolutions based on https://iopscience.iop.org/article/10.1088/1742-6596/120/5/052003/pdf
@@ -26,17 +29,10 @@ ANALYSIS_TH = {"miniboone": 0.02, "microboone": None}
 
 def reco_EnuCCQE(Evis, costheta):
     # this assumes quasi-elastic scattering to mimmick MiniBooNE's assumption that the underlying events are nueCC.
-    num = (
-        const.m_neutron * Evis
-        - (const.m_neutron**2 + const.m_e**2 - const.m_proton**2) / 2
-    )
+    num = const.m_neutron * Evis - (const.m_neutron**2 + const.m_e**2 - const.m_proton**2) / 2
     physical = Evis**2 - const.m_e**2 > 0
     den = np.full(len(Evis), np.nan)
-    den[physical] = (
-        const.m_neutron
-        - Evis[physical]
-        + np.sqrt(Evis[physical] ** 2 - const.m_e**2) * costheta[physical]
-    )
+    den[physical] = const.m_neutron - Evis[physical] + np.sqrt(Evis[physical] ** 2 - const.m_e**2) * costheta[physical]
     Enu = num / den
     return Enu
 
@@ -53,7 +49,7 @@ def mee_cut_func(Evis):
     return 0.03203 + 0.007417 * (Evis) + 0.02738 * (Evis) ** 2
 
 
-def get_r_cut_func(cut="circ1", extrapolate=True, uncertainty_case="1cut100samples"):
+def get_r_cut_func(cut="circ1", extrapolate=True, uncertainty_case="1cut100samples", version=""):
     """get_r_cut_func get interpolation of the r cut from
             Kelly and Kopp (2022) -- https://arxiv.org/abs/2210.08021
 
@@ -72,7 +68,8 @@ def get_r_cut_func(cut="circ1", extrapolate=True, uncertainty_case="1cut100sampl
         interpolatation of the r cut function as a function of Evis.
     """
     cut_data = np.genfromtxt(
-        open_text("fastbnb.include.pi0_tools", "pi0_circle_cuts.dat"), unpack=True
+        open_text("fastbnb.include.pi0_tools", f"pi0_circle_cuts{version}.dat"),
+        unpack=True,
     )
 
     bin_l = cut_data[0]
@@ -86,9 +83,7 @@ def get_r_cut_func(cut="circ1", extrapolate=True, uncertainty_case="1cut100sampl
     elif uncertainty_case == "1cut100samples":
         pass
     else:
-        print(
-            f"Error: No uncertainty case {uncertainty_case}. Options are '100cut1sample' and '1cut100samples'. Defaulting to 1cut100samples."
-        )
+        print(f"Error: No uncertainty case {uncertainty_case}. Options are '100cut1sample' and '1cut100samples'. Defaulting to 1cut100samples.")
         pass
 
     cuts = cut_data[access_index]
@@ -96,9 +91,7 @@ def get_r_cut_func(cut="circ1", extrapolate=True, uncertainty_case="1cut100sampl
     try:
         cut_data = cuts
     except KeyError:
-        print(
-            f"Error: No Rcut function for {cut} kind. Options are 'circ0', 'circ1', and 'diag'. Defaulting to circ0."
-        )
+        print(f"Error: No Rcut function for {cut} kind. Options are 'circ0', 'circ1', and 'diag'. Defaulting to circ0.")
         cut_data = cut_data[4]
 
     if extrapolate:
@@ -110,9 +103,7 @@ def get_r_cut_func(cut="circ1", extrapolate=True, uncertainty_case="1cut100sampl
             bounds_error=False,
         )
     else:
-        return interp1d(
-            bin_c, cut_data, kind="linear", fill_value=None, bounds_error=False
-        )
+        return interp1d(bin_c, cut_data, kind="linear", fill_value=None, bounds_error=False)
 
 
 def efficiency(samples, weights, xmin, xmax):
@@ -198,11 +189,7 @@ def smear_samples(samples, mass=const.m_e, exp="miniboone"):
         # apply exponentially modified gaussian with exponential rate lambda = 1/K = 1 --> K=1
         K = 1
         T = exponnorm.rvs(K, loc=T, scale=sigma_E)
-        ctheta = np.cos(
-            exponnorm.rvs(
-                K, loc=np.arccos(ctheta), scale=sigma_angle * np.ones(nentries)
-            )
-        )
+        ctheta = np.cos(exponnorm.rvs(K, loc=np.arccos(ctheta), scale=sigma_angle * np.ones(nentries)))
 
     # Unfortunately, a Gaussian energy smearing can give non-physical results.
     T[T < 0] = 0  # force smearing to be positive for T
@@ -212,8 +199,6 @@ def smear_samples(samples, mass=const.m_e, exp="miniboone"):
     stheta = np.sqrt(1 - ctheta**2)
 
     # put data in an array and then in a DataFrame
-    smeared = np.array(
-        [E, P * stheta * np.cos(phi), P * stheta * np.sin(phi), P * ctheta]
-    ).T
+    smeared = np.array([E, P * stheta * np.cos(phi), P * stheta * np.sin(phi), P * ctheta]).T
 
     return smeared

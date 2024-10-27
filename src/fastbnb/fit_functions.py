@@ -1,20 +1,11 @@
 import numpy as np
 import scipy
-import matplotlib.pyplot as plt
-import pandas as pd
-import matplotlib.patches as mpatches
-from matplotlib import cm
-from scipy.stats import chi2 as chi2_scipy
-
-from pathos.multiprocessing import ProcessingPool as Pool
-from matplotlib import ticker
 
 from DarkNews import const
-from DarkNews import NuclearTarget
 from fastbnb import decayer
 from fastbnb import analysis
 from fastbnb import grid_fit
-from fastbnb import plot_tools
+
 
 from importlib.resources import open_text
 
@@ -26,12 +17,7 @@ umu4_def = np.sqrt(1.0e-12)
 umu5_def = np.sqrt(1.0e-12)
 epsilon_def = 1e-4
 
-vmu5_def = (
-    gD_def
-    * ud5_def
-    * (umu4_def * ud4_def + umu5_def * ud5_def)
-    / np.sqrt(1 - umu4_def**2 - umu5_def**2)
-)
+vmu5_def = gD_def * ud5_def * (umu4_def * ud4_def + umu5_def * ud5_def) / np.sqrt(1 - umu4_def**2 - umu5_def**2)
 v4i_def = gD_def * ud4_def * umu4_def
 vmu4_def = gD_def * ud4_def * ud4_def * umu4_def / np.sqrt(1 - umu4_def**2)
 
@@ -43,21 +29,11 @@ epsilon = 1e-4
 r_eps = epsilon / epsilon_def
 
 # bins for fast histogram preparation
-bin_e_def = np.array(
-    [0.2, 0.3, 0.375, 0.475, 0.55, 0.675, 0.8, 0.95, 1.1, 1.3, 1.5, 3.0]
-)
-bin_enu_def = np.genfromtxt(
-    open_text("fastbnb.include.miniboone_2020", "Enu_bin_edges.dat")
-)
-bin_costheta_def = np.genfromtxt(
-    open_text("fastbnb.include.miniboone_2020", "Costheta_bin_edges.dat")
-)
-bin_evis_def = np.genfromtxt(
-    open_text("fastbnb.include.miniboone_2020", "Evis_bin_edges.dat")
-)
-bin_invmass_def = np.genfromtxt(
-    open_text("fastbnb.include.pi0_tools", "Invmass_bin_edges.dat")
-)
+bin_e_def = np.array([0.2, 0.3, 0.375, 0.475, 0.55, 0.675, 0.8, 0.95, 1.1, 1.3, 1.5, 3.0])
+bin_enu_def = np.genfromtxt(open_text("fastbnb.include.miniboone_2020", "Enu_bin_edges.dat"))
+bin_costheta_def = np.genfromtxt(open_text("fastbnb.include.miniboone_2020", "Costheta_bin_edges.dat"))
+bin_evis_def = np.genfromtxt(open_text("fastbnb.include.miniboone_2020", "Evis_bin_edges.dat"))
+bin_invmass_def = np.genfromtxt(open_text("fastbnb.include.pi0_tools", "Invmass_bin_edges.dat"))
 
 # data for plots
 plotvars = {"3+1": ["mzprime", "m4"], "3+2": ["m5", "delta"]}
@@ -93,9 +69,7 @@ def round_sig(x, sig=1):
 def get_decay_length(df, coupling_factor=1.0):
     # get momenta and decay length for decay_N
     pN = df.P_decay_N_parent.values
-    l_decay_proper_cm = (
-        const.get_decay_rate_in_cm(np.sum(df.w_decay_rate_0)) / coupling_factor**2
-    )
+    l_decay_proper_cm = const.get_decay_rate_in_cm(np.sum(df.w_decay_rate_0)) / coupling_factor**2
 
     # compute the position of decay
     x, y, z = decayer.decay_position(pN, l_decay_proper_cm)[1:]
@@ -136,11 +110,7 @@ def chi2_binned_rate(NP_MC, NPevents, back_MC, D, sys=[0.1, 0.1]):
 
         mu = NP_MC * (1 + alpha) + back_MC * (1 + beta)
 
-        return (
-            2 * np.sum(mu - D + safe_log(D, mu))
-            + np.sum(alpha**2 / (err_flux**2))
-            + np.sum(beta**2 / (err_back**2))
-        )
+        return 2 * np.sum(mu - D + safe_log(D, mu)) + np.sum(alpha**2 / (err_flux**2)) + np.sum(beta**2 / (err_back**2))
 
     cons = {"type": "ineq", "fun": lambda x: x}
 
@@ -191,11 +161,7 @@ def chi2_MiniBooNE_2020(NP_MC, NPevents=None, mode="fhc"):
             f"miniboone_nue{bar}bgr_lowe.txt",
         )
     )
-    numu_bkg = np.genfromtxt(
-        open_text(
-            f"fastbnb.include.MB_data_release.{mode}mode", f"miniboone_numu{bar}.txt"
-        )
-    )
+    numu_bkg = np.genfromtxt(open_text(f"fastbnb.include.MB_data_release.{mode}mode", f"miniboone_numu{bar}.txt"))
 
     fract_covariance = np.genfromtxt(
         open_text(
@@ -215,9 +181,7 @@ def chi2_MiniBooNE_2020(NP_MC, NPevents=None, mode="fhc"):
     NP_diag_matrix = np.diag(np.concatenate([NP_MC, nue_bkg * 0.0, numu_bkg * 0.0]))
     tot_diag_matrix = np.diag(np.concatenate([NP_MC, nue_bkg, numu_bkg]))
 
-    rescaled_covariance = np.dot(
-        tot_diag_matrix, np.dot(fract_covariance, tot_diag_matrix)
-    )
+    rescaled_covariance = np.dot(tot_diag_matrix, np.dot(fract_covariance, tot_diag_matrix))
     rescaled_covariance += NP_diag_matrix  # this adds the statistical error on data
 
     # collapse background part of the covariance
@@ -234,19 +198,13 @@ def chi2_MiniBooNE_2020(NP_MC, NPevents=None, mode="fhc"):
     )
     error_matrix[n_signal : (n_signal + n_numu), 0:n_signal] = (
         rescaled_covariance[2 * n_signal : (2 * n_signal + n_numu), 0:n_signal]
-        + rescaled_covariance[
-            2 * n_signal : (2 * n_signal + n_numu), n_signal : 2 * n_signal
-        ]
+        + rescaled_covariance[2 * n_signal : (2 * n_signal + n_numu), n_signal : 2 * n_signal]
     )
     error_matrix[0:n_signal, n_signal : (n_signal + n_numu)] = (
         rescaled_covariance[0:n_signal, 2 * n_signal : (2 * n_signal + n_numu)]
-        + rescaled_covariance[
-            n_signal : 2 * n_signal, 2 * n_signal : (2 * n_signal + n_numu)
-        ]
+        + rescaled_covariance[n_signal : 2 * n_signal, 2 * n_signal : (2 * n_signal + n_numu)]
     )
-    error_matrix[
-        n_signal : (n_signal + n_numu), n_signal : (n_signal + n_numu)
-    ] = rescaled_covariance[
+    error_matrix[n_signal : (n_signal + n_numu), n_signal : (n_signal + n_numu)] = rescaled_covariance[
         2 * n_signal : 2 * n_signal + n_numu, 2 * n_signal : (2 * n_signal + n_numu)
     ]
 
@@ -260,9 +218,7 @@ def chi2_MiniBooNE_2020(NP_MC, NPevents=None, mode="fhc"):
     inv_cov = np.linalg.inv(error_matrix)
 
     # calculate chi^2
-    chi2 = np.dot(
-        residuals, np.dot(inv_cov, residuals)
-    )  # + np.log(np.linalg.det(error_matrix))
+    chi2 = np.dot(residuals, np.dot(inv_cov, residuals))  # + np.log(np.linalg.det(error_matrix))
 
     if chi2 >= 0:
         return chi2
@@ -320,9 +276,7 @@ def chi2_MiniBooNE_2020_combined(NP_MC, NP_MC_BAR, NPevents=None, NPevents_BAR=N
             f"miniboone_nue{bar}bgr_lowe.txt",
         )
     )
-    numu_bkg = np.genfromtxt(
-        open_text(f"fastbnb.include.MB_data_release.{mode}", f"miniboone_numu{bar}.txt")
-    )
+    numu_bkg = np.genfromtxt(open_text(f"fastbnb.include.MB_data_release.{mode}", f"miniboone_numu{bar}.txt"))
 
     ##########################################
     # Load antineutrino data
@@ -346,9 +300,7 @@ def chi2_MiniBooNE_2020_combined(NP_MC, NP_MC_BAR, NPevents=None, NPevents_BAR=N
             f"miniboone_nue{bar}bgr_lowe.txt",
         )
     )
-    numu_bkg_bar = np.genfromtxt(
-        open_text(f"fastbnb.include.MB_data_release.{mode}", f"miniboone_numu{bar}.txt")
-    )
+    numu_bkg_bar = np.genfromtxt(open_text(f"fastbnb.include.MB_data_release.{mode}", f"miniboone_numu{bar}.txt"))
 
     ##########################################
     # Load covariance matrix
@@ -371,13 +323,9 @@ def chi2_MiniBooNE_2020_combined(NP_MC, NP_MC_BAR, NPevents=None, NPevents_BAR=N
             ]
         )
     )
-    tot_diag_matrix = np.diag(
-        np.concatenate([NP_MC, nue_bkg, numu_bkg, NP_MC_BAR, nue_bkg_bar, numu_bkg_bar])
-    )
+    tot_diag_matrix = np.diag(np.concatenate([NP_MC, nue_bkg, numu_bkg, NP_MC_BAR, nue_bkg_bar, numu_bkg_bar]))
 
-    rescaled_covariance = np.dot(
-        tot_diag_matrix, np.dot(fract_covariance, tot_diag_matrix)
-    )
+    rescaled_covariance = np.dot(tot_diag_matrix, np.dot(fract_covariance, tot_diag_matrix))
     rescaled_covariance += NP_diag_matrix  # this adds the statistical error on data
 
     # collapse background part of the covariance
@@ -436,9 +384,7 @@ def chi2_MiniBooNE_2020_combined(NP_MC, NP_MC_BAR, NPevents=None, NPevents_BAR=N
     inv_cov = np.linalg.inv(error_matrix)
 
     # calculate chi^2
-    chi2 = np.dot(
-        residuals, np.dot(inv_cov, residuals)
-    )  # + np.log(np.linalg.det(error_matrix))
+    chi2 = np.dot(residuals, np.dot(inv_cov, residuals))  # + np.log(np.linalg.det(error_matrix))
 
     if chi2 >= 0:
         return chi2
@@ -456,20 +402,12 @@ def StackCovarianceMatrix(big_covariance, n_signal, n_numu):
         + big_covariance[n_signal : 2 * n_signal, n_signal : 2 * n_signal]
     )
     covariance[n_signal : (n_signal + n_numu), 0:n_signal] = (
-        big_covariance[2 * n_signal : (2 * n_signal + n_numu), 0:n_signal]
-        + big_covariance[
-            2 * n_signal : (2 * n_signal + n_numu), n_signal : 2 * n_signal
-        ]
+        big_covariance[2 * n_signal : (2 * n_signal + n_numu), 0:n_signal] + big_covariance[2 * n_signal : (2 * n_signal + n_numu), n_signal : 2 * n_signal]
     )
     covariance[0:n_signal, n_signal : (n_signal + n_numu)] = (
-        big_covariance[0:n_signal, 2 * n_signal : (2 * n_signal + n_numu)]
-        + big_covariance[
-            n_signal : 2 * n_signal, 2 * n_signal : (2 * n_signal + n_numu)
-        ]
+        big_covariance[0:n_signal, 2 * n_signal : (2 * n_signal + n_numu)] + big_covariance[n_signal : 2 * n_signal, 2 * n_signal : (2 * n_signal + n_numu)]
     )
-    covariance[
-        n_signal : (n_signal + n_numu), n_signal : (n_signal + n_numu)
-    ] = big_covariance[
+    covariance[n_signal : (n_signal + n_numu), n_signal : (n_signal + n_numu)] = big_covariance[
         2 * n_signal : 2 * n_signal + n_numu, 2 * n_signal : (2 * n_signal + n_numu)
     ]
 
@@ -484,21 +422,11 @@ def MassageCovarianceMatrix(big_covariance, n_signal, n_numu):
 
     covariance = np.zeros([n_total * 2, n_total * 2])
 
-    covariance[0:n_total, 0:n_total] = StackCovarianceMatrix(
-        big_covariance[0:n_total_big, 0:n_total_big], n_signal, n_numu
-    )
-    covariance[n_total : (2 * n_total), 0:n_total] = StackCovarianceMatrix(
-        big_covariance[n_total_big : (2 * n_total_big), 0:n_total_big], n_signal, n_numu
-    )
-    covariance[0:n_total, n_total : (2 * n_total)] = StackCovarianceMatrix(
-        big_covariance[0:n_total_big, n_total_big : (2 * n_total_big)], n_signal, n_numu
-    )
-    covariance[
-        n_total : (2 * n_total), n_total : (2 * n_total)
-    ] = StackCovarianceMatrix(
-        big_covariance[
-            n_total_big : (2 * n_total_big), n_total_big : (2 * n_total_big)
-        ],
+    covariance[0:n_total, 0:n_total] = StackCovarianceMatrix(big_covariance[0:n_total_big, 0:n_total_big], n_signal, n_numu)
+    covariance[n_total : (2 * n_total), 0:n_total] = StackCovarianceMatrix(big_covariance[n_total_big : (2 * n_total_big), 0:n_total_big], n_signal, n_numu)
+    covariance[0:n_total, n_total : (2 * n_total)] = StackCovarianceMatrix(big_covariance[0:n_total_big, n_total_big : (2 * n_total_big)], n_signal, n_numu)
+    covariance[n_total : (2 * n_total), n_total : (2 * n_total)] = StackCovarianceMatrix(
+        big_covariance[n_total_big : (2 * n_total_big), n_total_big : (2 * n_total_big)],
         n_signal,
         n_numu,
     )
@@ -517,23 +445,11 @@ def cov_matrix_MB():
     )
     bin_w = -bin_e[:-1] + bin_e[1:]
 
-    nue_data = np.genfromtxt(
-        open_text(
-            "fastbnb.include.MB_data_release.fhcmode", "miniboone_nuedata_lowe.txt"
-        )
-    )
-    numu_data = np.genfromtxt(
-        open_text("fastbnb.include.MB_data_release.fhcmode", "miniboone_numudata.txt")
-    )
+    nue_data = np.genfromtxt(open_text("fastbnb.include.MB_data_release.fhcmode", "miniboone_nuedata_lowe.txt"))
+    numu_data = np.genfromtxt(open_text("fastbnb.include.MB_data_release.fhcmode", "miniboone_numudata.txt"))
 
-    nue_bkg = np.genfromtxt(
-        open_text(
-            "fastbnb.include.MB_data_release.fhcmode", "miniboone_nuebgr_lowe.txt"
-        )
-    )
-    numu_bkg = np.genfromtxt(
-        open_text("fastbnb.include.MB_data_release.fhcmode", "miniboone_numu.txt")
-    )
+    nue_bkg = np.genfromtxt(open_text("fastbnb.include.MB_data_release.fhcmode", "miniboone_nuebgr_lowe.txt"))
+    numu_bkg = np.genfromtxt(open_text("fastbnb.include.MB_data_release.fhcmode", "miniboone_numu.txt"))
 
     fract_covariance = np.genfromtxt(
         open_text(
@@ -542,14 +458,10 @@ def cov_matrix_MB():
         )
     )
 
-    NP_diag_matrix = np.diag(
-        np.concatenate([nue_data - nue_bkg, nue_bkg * 0.0, numu_bkg * 0.0])
-    )
+    NP_diag_matrix = np.diag(np.concatenate([nue_data - nue_bkg, nue_bkg * 0.0, numu_bkg * 0.0]))
     tot_diag_matrix = np.diag(np.concatenate([nue_data - nue_bkg, nue_bkg, numu_bkg]))
 
-    rescaled_covariance = np.dot(
-        tot_diag_matrix, np.dot(fract_covariance, tot_diag_matrix)
-    )
+    rescaled_covariance = np.dot(tot_diag_matrix, np.dot(fract_covariance, tot_diag_matrix))
     rescaled_covariance += NP_diag_matrix  # this adds the statistical error on data
 
     # collapse background part of the covariance
@@ -567,19 +479,13 @@ def cov_matrix_MB():
     )
     error_matrix[n_signal : (n_signal + n_numu), 0:n_signal] = (
         rescaled_covariance[2 * n_signal : (2 * n_signal + n_numu), 0:n_signal]
-        + rescaled_covariance[
-            2 * n_signal : (2 * n_signal + n_numu), n_signal : 2 * n_signal
-        ]
+        + rescaled_covariance[2 * n_signal : (2 * n_signal + n_numu), n_signal : 2 * n_signal]
     )
     error_matrix[0:n_signal, n_signal : (n_signal + n_numu)] = (
         rescaled_covariance[0:n_signal, 2 * n_signal : (2 * n_signal + n_numu)]
-        + rescaled_covariance[
-            n_signal : 2 * n_signal, 2 * n_signal : (2 * n_signal + n_numu)
-        ]
+        + rescaled_covariance[n_signal : 2 * n_signal, 2 * n_signal : (2 * n_signal + n_numu)]
     )
-    error_matrix[
-        n_signal : (n_signal + n_numu), n_signal : (n_signal + n_numu)
-    ] = rescaled_covariance[
+    error_matrix[n_signal : (n_signal + n_numu), n_signal : (n_signal + n_numu)] = rescaled_covariance[
         2 * n_signal : 2 * n_signal + n_numu, 2 * n_signal : (2 * n_signal + n_numu)
     ]
 
@@ -630,9 +536,7 @@ def chi2_MiniBooNE_2020_3p1(
     decay_l = l_decay_proper_cm / decay_rescale
 
     if post_analysis:
-        df_decay = decayer.decay_selection(
-            df, l_decay_proper_cm=decay_l, experiment="miniboone", weights="reco_w"
-        )
+        df_decay = decayer.decay_selection(df, l_decay_proper_cm=decay_l, experiment="miniboone", weights="reco_w")
     else:
         df_decay = decayer.decay_selection(
             df,
@@ -642,9 +546,7 @@ def chi2_MiniBooNE_2020_3p1(
         )
         df_decay = analysis.reco_nueCCQElike_Enu(df_decay, cut=cut, clean_df=True)
 
-    return chi2_MiniBooNE_2020(
-        get_MiniBooNE_Enu_bin_vals(df_decay) * rate_rescale, mode=mode
-    )
+    return chi2_MiniBooNE_2020(get_MiniBooNE_Enu_bin_vals(df_decay) * rate_rescale, mode=mode)
 
 
 def chi2_MiniBooNE_2020_3p2(df, rate_rescale=1.0, mode="fhc"):
@@ -665,22 +567,16 @@ def chi2_MiniBooNE_2020_3p2(df, rate_rescale=1.0, mode="fhc"):
     # No decay length rescale here as xsec and decay are decoupled.
 
     df_decay = df.copy(deep=True)
-    return chi2_MiniBooNE_2020(
-        get_MiniBooNE_Enu_bin_vals(df_decay) * rate_rescale, mode=mode
-    )
+    return chi2_MiniBooNE_2020(get_MiniBooNE_Enu_bin_vals(df_decay) * rate_rescale, mode=mode)
 
 
 def get_MiniBooNE_Enu_bin_vals(df):
-    hist = np.histogram(
-        df["reco_Enu"], weights=df["reco_w"], bins=bin_e_def, density=False
-    )
+    hist = np.histogram(df["reco_Enu"], weights=df["reco_w"], bins=bin_e_def, density=False)
     return hist[0]
 
 
 def get_MiniBooNE_Evis_bin_vals(df):
-    hist = np.histogram(
-        df["reco_Evis"], weights=df["reco_w"], bins=bin_evis_def, density=False
-    )
+    hist = np.histogram(df["reco_Evis"], weights=df["reco_w"], bins=bin_evis_def, density=False)
     return hist[0]
 
 
@@ -709,17 +605,13 @@ def miniboone_rates_and_chi2(df_fhc, df_rhc, rescale=1, cut="circ1", decay_l=Non
         decay_l = df_fhc.attrs["N4_ctau0"]
 
     # Neutrino mode
-    df_fhc_temp = decayer.decay_selection(
-        df_fhc, decay_l, "miniboone", weights="w_event_rate"
-    )
+    df_fhc_temp = decayer.decay_selection(df_fhc, decay_l, "miniboone", weights="w_event_rate")
     df_fhc_temp = analysis.reco_nueCCQElike_Enu(df_fhc_temp, cut=cut, clean_df=True)
     df_fhc_temp["w_event_rate"] *= rescale
     df_fhc_temp["reco_w"] *= rescale
 
     # Antineutrino mode
-    df_rhc_temp = decayer.decay_selection(
-        df_rhc, decay_l, "miniboone", weights="w_event_rate"
-    )
+    df_rhc_temp = decayer.decay_selection(df_rhc, decay_l, "miniboone", weights="w_event_rate")
     df_rhc_temp = analysis.reco_nueCCQElike_Enu(df_rhc_temp, cut=cut, clean_df=True)
     df_rhc_temp["w_event_rate"] *= rescale
     df_rhc_temp["reco_w"] *= rescale

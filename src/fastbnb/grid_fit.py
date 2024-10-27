@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib import cm
 
-from filelock import FileLock
+from filelock import FileLock, Timeout
 
 from DarkNews import const
 from DarkNews.GenLauncher import GenLauncher
@@ -29,44 +29,46 @@ epsilon_def = 8e-4
 
 
 def save_to_locked_file(filename, output):
-    # Lock file and write to it safely
     lockfile_name = filename + ".lock"
-    lock = FileLock(lockfile_name)
-    with lock:
-        with open(filename, "a") as f:
-            f.write(output)
-    os.remove(lockfile_name)
+    lock = FileLock(lockfile_name, timeout=10)
+    try:
+        with lock.acquire():
+            with open(filename, "a") as f:
+                f.write(output)
+    except Exception as e:
+        print(f"Failed to acquire lock or write to file: {e}")
+    finally:
+        if lock.is_locked:
+            lock.release()
 
 
 def get_line_from_input(path, i_line, **kwargs):
-    # Prob dont need to lock it, but just in case:
     path_input = path + "input_scan.dat"
     lock = FileLock(path_input + ".lock")
+
     try:
-        with lock:
+        with lock.acquire(timeout=10):
             with open(path_input, "r") as f:
                 lines = f.readlines()
+    except Timeout:
+        raise TimeoutError(f"Timeout: Could not acquire lock for {path_input}.lock")
     except FileNotFoundError:
-        raise FileNotFoundError(
-            f"File {path_input} not found. Input file should have been created in submission script."
-        )
+        raise FileNotFoundError(f"File {path_input} not found. Input file should have been created in submission script.")
 
     try:
         x, y = [np.float32(x) for x in lines[i_line].split()]
     except IndexError:
         raise IndexError(f"No input for line {i_line} in {path_input}.")
+
     return x, y
 
 
 def get_kwargs_from_input(path):
-    # Now input kwargs for generation inputs
     try:
         kwargs = np.load(path + "input_kwargs.npy", allow_pickle=True).item()
     except FileNotFoundError:
-        print(
-            "No input parameters passed or file found. Please provide kwargs with generation inputs."
-        )
-        return 0
+        print("No input parameters passed or file found. Please provide kwargs with generation inputs.")
+        return None
     return kwargs
 
 
@@ -91,9 +93,7 @@ def get_data_MB(varplot="reco_Evis"):
             unpack=True,
         )
         _, bkg = np.genfromtxt(
-            resources.open_text(
-                "fastbnb.include.miniboone_2020", "Enu_constrained_bkg.dat"
-            ),
+            resources.open_text("fastbnb.include.miniboone_2020", "Enu_constrained_bkg.dat"),
             unpack=True,
         )
         _, error_low = np.genfromtxt(
@@ -319,11 +319,7 @@ class grid_analysis:
                 "Umu4": Umu4_def,
                 "epsilon": epsilon_def if epsilon_def else 8e-4,
             }
-            self.v4i_def = (
-                self.couplings_def["gD"]
-                * self.couplings_def["UD4"]
-                * self.couplings_def["Umu4"]
-            )
+            self.v4i_def = self.couplings_def["gD"] * self.couplings_def["UD4"] * self.couplings_def["Umu4"]
             self.vmu4_def = (
                 self.couplings_def["gD"]
                 * self.couplings_def["UD4"]
@@ -343,15 +339,8 @@ class grid_analysis:
             self.vmu5_def = (
                 self.couplings_def["gD"]
                 * self.couplings_def["UD5"]
-                * (
-                    self.couplings_def["Umu4"] * self.couplings_def["UD4"]
-                    + self.couplings_def["Umu5"] * self.couplings_def["UD5"]
-                )
-                / np.sqrt(
-                    1
-                    - self.couplings_def["Umu4"] ** 2
-                    - self.couplings_def["Umu5"] ** 2
-                )
+                * (self.couplings_def["Umu4"] * self.couplings_def["UD4"] + self.couplings_def["Umu5"] * self.couplings_def["UD5"])
+                / np.sqrt(1 - self.couplings_def["Umu4"] ** 2 - self.couplings_def["Umu5"] ** 2)
             )
 
         # initialize coupling parameters to be considered
@@ -363,13 +352,7 @@ class grid_analysis:
                 "epsilon": epsilon if epsilon else 8e-4,
             }
             self.v4i = lambda umu4: self.couplings["gD"] * self.couplings["UD4"] * umu4
-            self.vmu4 = (
-                lambda umu4: self.couplings["gD"]
-                * self.couplings["UD4"]
-                * self.couplings["UD4"]
-                * umu4
-                / np.sqrt(1 - umu4**2)
-            )
+            self.vmu4 = lambda umu4: self.couplings["gD"] * self.couplings["UD4"] * self.couplings["UD4"] * umu4 / np.sqrt(1 - umu4**2)
         elif model == "3+2":
             self.couplings = {
                 "UD4": UD4 if UD4 else UD4_def,
@@ -405,12 +388,7 @@ class grid_analysis:
 
                     try:
                         pd.read_parquet(
-                            location
-                            + "/"
-                            + self.experiment
-                            + f"/3plus1/m4_{m4s}_mzprime_{mzs}_"
-                            + self.HNLtype
-                            + "/pandas_df.parquet",
+                            location + "/" + self.experiment + f"/3plus1/m4_{m4s}_mzprime_{mzs}_" + self.HNLtype + "/pandas_df.parquet",
                             engine="pyarrow",
                         )
                     except FileNotFoundError:
@@ -495,12 +473,7 @@ class grid_analysis:
                         continue
                     try:
                         pd.read_parquet(
-                            location
-                            + "/"
-                            + self.experiment
-                            + f"/3plus2/m5_{m5s}_m4_{m4s}_mzprime_{mzs}_"
-                            + self.HNLtype
-                            + "/pandas_df.parquet",
+                            location + "/" + self.experiment + f"/3plus2/m5_{m5s}_m4_{m4s}_mzprime_{mzs}_" + self.HNLtype + "/pandas_df.parquet",
                             engine="pyarrow",
                         )
                     except FileNotFoundError:
@@ -537,10 +510,7 @@ class grid_analysis:
         os.makedirs(location_fit, exist_ok=True)
         if self.model == "3+1":
             A_cut = self.UmuN_max
-            data_list = [
-                location_fit + f"/chi2_enu_3p1_y_axis_{k}.dat"
-                for k in range(self.grid_params["y_points"])
-            ]
+            data_list = [location_fit + f"/chi2_enu_3p1_y_axis_{k}.dat" for k in range(self.grid_params["y_points"])]
 
             def chi2_grid(k_y):
                 data_tot_enu = []
@@ -563,12 +533,7 @@ class grid_analysis:
 
                         try:
                             df = pd.read_parquet(
-                                location
-                                + "/"
-                                + self.experiment
-                                + f"/3plus1/m4_{m4s}_mzprime_{mzs}_"
-                                + self.HNLtype
-                                + "/pandas_df.parquet",
+                                location + "/" + self.experiment + f"/3plus1/m4_{m4s}_mzprime_{mzs}_" + self.HNLtype + "/pandas_df.parquet",
                                 engine="pyarrow",
                             )
                         except:
@@ -585,9 +550,7 @@ class grid_analysis:
                             on_shell = False
 
                         gen_num = np.abs(np.sum(df["reco_w"])) * self.r_eps**2
-                        estim_umu4 = (
-                            np.sqrt(560.0 / gen_num) * self.vmu4_def
-                        )  # we are assuming vmu4 is close to umu4
+                        estim_umu4 = np.sqrt(560.0 / gen_num) * self.vmu4_def  # we are assuming vmu4 is close to umu4
 
                         init_guess = np.min([estim_umu4, A_cut])
                         init_guess = np.arccos(np.sqrt(np.abs(init_guess / A_cut)))
@@ -611,19 +574,13 @@ class grid_analysis:
                         else:
                             df_decay = av.select_MB_decay_expo_prob(
                                 df,
-                                coupling_factor=self.v4i(umu4_bf)
-                                / self.v4i_def
-                                * self.r_eps,
+                                coupling_factor=self.v4i(umu4_bf) / self.v4i_def * self.r_eps,
                                 l_decay_proper_cm=decay_l,
                             )
-                        sum_w_post_smearing = (
-                            np.abs(np.sum(df_decay["reco_w"])) * self.r_eps**2
-                        )
+                        sum_w_post_smearing = np.abs(np.sum(df_decay["reco_w"])) * self.r_eps**2
                         vmu4_bf = self.vmu4(umu4_bf)
 
-                        data_enu[0][3] = (
-                            vmu4_bf / self.vmu4_def
-                        ) ** 2 * sum_w_post_smearing
+                        data_enu[0][3] = (vmu4_bf / self.vmu4_def) ** 2 * sum_w_post_smearing
                         data_enu[0][2] = res_enu.fun
                         data_enu[0][6] = sum_w_post_smearing
                         data_enu[0][7] = self.v4i(vmu4_bf)
@@ -637,10 +594,7 @@ class grid_analysis:
 
         elif self.model == "3+2":
             v_cut = self.vmu5(self.UmuN_max, self.UmuN_max)
-            data_list = [
-                location_fit + f"/chi2_enu_3p2_y_axis_{k}.dat"
-                for k in range(self.grid_params["y_points"])
-            ]
+            data_list = [location_fit + f"/chi2_enu_3p2_y_axis_{k}.dat" for k in range(self.grid_params["y_points"])]
 
             def chi2_grid(k_y):
                 data_tot_enu = []
@@ -706,12 +660,7 @@ class grid_analysis:
 
                         try:
                             pd.read_parquet(
-                                location
-                                + "/"
-                                + self.experiment
-                                + f"/3plus2/m5_{m5s}_m4_{m4s}_mzprime_{mzs}_"
-                                + self.HNLtype
-                                + "/pandas_df.parquet",
+                                location + "/" + self.experiment + f"/3plus2/m5_{m5s}_m4_{m4s}_mzprime_{mzs}_" + self.HNLtype + "/pandas_df.parquet",
                                 engine="pyarrow",
                             )
                         except:
@@ -724,9 +673,7 @@ class grid_analysis:
                         df = df[df.reco_w > 0]
 
                         if m5s - m4s >= mzs:
-                            df = av.select_MB_decay_expo_prob(
-                                df, coupling_factor=1, l_decay_proper_cm=decay_l
-                            )
+                            df = av.select_MB_decay_expo_prob(df, coupling_factor=1, l_decay_proper_cm=decay_l)
                             data_enu[0][6] = decay_l
                         else:
                             df = av.select_MB_decay_expo_prob(
@@ -736,26 +683,18 @@ class grid_analysis:
                             )
                             data_enu[0][6] = decay_l / self.r_eps**2
                         df = df[df.reco_w > 0]
-                        sum_w_post_smearing = (
-                            np.abs(np.sum(df["reco_w"])) * self.r_eps**2
-                        )
+                        sum_w_post_smearing = np.abs(np.sum(df["reco_w"])) * self.r_eps**2
 
                         data_enu[0][3] = sum_w_post_smearing
 
                         if sum_w_post_smearing != 0:
-                            guess0 = np.sqrt(
-                                np.sqrt(560.0 / sum_w_post_smearing)
-                                * self.vmu5_def
-                                / v_cut
-                            )
+                            guess0 = np.sqrt(np.sqrt(560.0 / sum_w_post_smearing) * self.vmu5_def / v_cut)
                         else:
                             guess0 = 1
                         guess = np.min([guess0, 1])
                         theta_guess = np.arccos(guess)
                         init_guess = np.array([theta_guess])
-                        chi2_enu = lambda theta: ff.chi2_MiniBooNE_2020_3p2(
-                            df, v_cut * np.cos(theta) ** 2, r_eps=self.r_eps
-                        )
+                        chi2_enu = lambda theta: ff.chi2_MiniBooNE_2020_3p2(df, v_cut * np.cos(theta) ** 2, r_eps=self.r_eps)
 
                         res_enu = scipy.optimize.minimize(chi2_enu, init_guess)
 
@@ -764,9 +703,7 @@ class grid_analysis:
                         data_enu[0][4] = vmu5_bf
                         data_enu[0][5] = res_enu.fun
 
-                        data_enu[0][7] = (
-                            vmu5_bf / self.vmu5_def
-                        ) ** 2 * sum_w_post_smearing
+                        data_enu[0][7] = (vmu5_bf / self.vmu5_def) ** 2 * sum_w_post_smearing
 
                         data_tot_enu += data_enu
 
@@ -833,26 +770,9 @@ class grid_analysis:
             "delta": r"$\Delta$",
         }
         if not (plot_path):
-            plot_path = (
-                "./fit_"
-                + self.model[0]
-                + "p"
-                + self.model[2]
-                + "_"
-                + self.HNLtype
-                + "_"
-                + self.experiment
-                + ".jpg"
-            )
+            plot_path = "./fit_" + self.model[0] + "p" + self.model[2] + "_" + self.HNLtype + "_" + self.experiment + ".jpg"
         if not (title):
-            title = (
-                r"Fitting for $E_\nu$, "
-                + self.model
-                + ", "
-                + self.HNLtype
-                + ", "
-                + self.experiment
-            )
+            title = r"Fitting for $E_\nu$, " + self.model + ", " + self.HNLtype + ", " + self.experiment
 
         # plot
         plt.tricontourf(X, Y, Z, levels=levels, cmap="viridis")
@@ -915,17 +835,7 @@ class grid_analysis_couplings:
         if output_file:
             self.output_file = output_file + ".dat"
         else:
-            self.output_file = (
-                "coupling_fit_"
-                + model[0]
-                + "p"
-                + model[2]
-                + "_"
-                + HNLtype
-                + "_"
-                + experiment
-                + ".dat"
-            )
+            self.output_file = "coupling_fit_" + model[0] + "p" + model[2] + "_" + HNLtype + "_" + experiment + ".dat"
         keys_3p1 = ["mzprime", "m4"]
         keys_3p2 = ["mzprime", "m4", "m5", "delta"]
         if log_interval_x:
@@ -943,9 +853,7 @@ class grid_analysis_couplings:
             self.params["mzprime"] = ff.round_sig(mzprime, 4)
             self.params["m4"] = ff.round_sig(m4, 4)
             self.params[x_label] = ff.round_sig(interval_func_x(*x_range), 4)
-            self.params["coupling"] = ff.round_sig(
-                interval_func_coupling(*coupling_range), 4
-            )
+            self.params["coupling"] = ff.round_sig(interval_func_coupling(*coupling_range), 4)
         elif model == "3+2":
             self.y_label = "vmu5"
             self.params = {key: None for key in keys_3p2}
@@ -954,9 +862,7 @@ class grid_analysis_couplings:
             self.params["m5"] = ff.round_sig(m5, 4)
             self.params["delta"] = ff.round_sig(delta, 4)
             self.params[x_label] = ff.round_sig(interval_func_x(*x_range), 4)
-            self.params["coupling"] = ff.round_sig(
-                interval_func_coupling(*coupling_range), 4
-            )
+            self.params["coupling"] = ff.round_sig(interval_func_coupling(*coupling_range), 4)
 
         # initialize grid parameters
         self.grid_params = {
@@ -1002,11 +908,7 @@ class grid_analysis_couplings:
                 "Umu4": Umu4_def,
                 "epsilon": epsilon_def if epsilon_def else 8e-4,
             }
-            self.v4i_def = (
-                self.couplings_def["gD"]
-                * self.couplings_def["UD4"]
-                * self.couplings_def["Umu4"]
-            )
+            self.v4i_def = self.couplings_def["gD"] * self.couplings_def["UD4"] * self.couplings_def["Umu4"]
             self.vmu4_def = (
                 self.couplings_def["gD"]
                 * self.couplings_def["UD4"]
@@ -1026,15 +928,8 @@ class grid_analysis_couplings:
             self.vmu5_def = (
                 self.couplings_def["gD"]
                 * self.couplings_def["UD5"]
-                * (
-                    self.couplings_def["Umu4"] * self.couplings_def["UD4"]
-                    + self.couplings_def["Umu5"] * self.couplings_def["UD5"]
-                )
-                / np.sqrt(
-                    1
-                    - self.couplings_def["Umu4"] ** 2
-                    - self.couplings_def["Umu5"] ** 2
-                )
+                * (self.couplings_def["Umu4"] * self.couplings_def["UD4"] + self.couplings_def["Umu5"] * self.couplings_def["UD5"])
+                / np.sqrt(1 - self.couplings_def["Umu4"] ** 2 - self.couplings_def["Umu5"] ** 2)
             )
 
         # initialize coupling parameters to be considered
@@ -1046,13 +941,7 @@ class grid_analysis_couplings:
                 "epsilon": epsilon if epsilon else 8e-4,
             }
             self.v4i = lambda umu4: self.couplings["gD"] * self.couplings["UD4"] * umu4
-            self.vmu4 = (
-                lambda umu4: self.couplings["gD"]
-                * self.couplings["UD4"]
-                * self.couplings["UD4"]
-                * umu4
-                / np.sqrt(1 - umu4**2)
-            )
+            self.vmu4 = lambda umu4: self.couplings["gD"] * self.couplings["UD4"] * self.couplings["UD4"] * umu4 / np.sqrt(1 - umu4**2)
         elif model == "3+2":
             self.couplings = {
                 "UD4": UD4 if UD4 else UD4_def,
@@ -1084,12 +973,7 @@ class grid_analysis_couplings:
 
                 try:
                     pd.read_parquet(
-                        location
-                        + "/"
-                        + self.experiment
-                        + f"/3plus1/m4_{m4s}_mzprime_{mzs}_"
-                        + self.HNLtype
-                        + "/pandas_df.parquet",
+                        location + "/" + self.experiment + f"/3plus1/m4_{m4s}_mzprime_{mzs}_" + self.HNLtype + "/pandas_df.parquet",
                         engine="pyarrow",
                     )
                 except:
@@ -1160,12 +1044,7 @@ class grid_analysis_couplings:
 
                 try:
                     pd.read_parquet(
-                        location
-                        + "/"
-                        + self.experiment
-                        + f"/3plus2/m5_{m5s}_m4_{m4s}_mzprime_{mzs}_"
-                        + self.HNLtype
-                        + "/pandas_df.parquet",
+                        location + "/" + self.experiment + f"/3plus2/m5_{m5s}_m4_{m4s}_mzprime_{mzs}_" + self.HNLtype + "/pandas_df.parquet",
                         engine="pyarrow",
                     )
                 except:
@@ -1199,15 +1078,10 @@ class grid_analysis_couplings:
     def fit_events(self, location="data", location_fit="data_fitting"):
         os.makedirs(location_fit, exist_ok=True)
         if self.model == "3+1":
-            data_list = [
-                location_fit + f"/chi2_enu_3p1_coupling_{k}.dat"
-                for k in range(self.grid_params["x_points"])
-            ]
+            data_list = [location_fit + f"/chi2_enu_3p1_coupling_{k}.dat" for k in range(self.grid_params["x_points"])]
 
             def chi2_grid(k_x):
-                bin_e = np.array(
-                    [0.2, 0.3, 0.375, 0.475, 0.55, 0.675, 0.8, 0.95, 1.1, 1.3, 1.5, 3.0]
-                )
+                bin_e = np.array([0.2, 0.3, 0.375, 0.475, 0.55, 0.675, 0.8, 0.95, 1.1, 1.3, 1.5, 3.0])
                 umu4 = self.params["coupling"]
                 n = self.grid_params["y_points"]
                 if self.x_label == "m4":
@@ -1222,12 +1096,7 @@ class grid_analysis_couplings:
 
                 try:
                     df = pd.read_parquet(
-                        location
-                        + "/"
-                        + self.experiment
-                        + f"/3plus1/m4_{m4s}_mzprime_{mzs}_"
-                        + self.HNLtype
-                        + "/pandas_df.parquet",
+                        location + "/" + self.experiment + f"/3plus1/m4_{m4s}_mzprime_{mzs}_" + self.HNLtype + "/pandas_df.parquet",
                         engine="pyarrow",
                     )
                     l_decay = const.get_decay_rate_in_cm(np.sum(df.w_decay_rate_0))
@@ -1242,9 +1111,7 @@ class grid_analysis_couplings:
                     for i in range(n):
                         data[i][3] = self.vmu4(umu4[i])
                         if m4s < mzs:
-                            coupling_factor = (
-                                umu4[i] / self.couplings_def["Umu4"] * self.r_eps
-                            )
+                            coupling_factor = umu4[i] / self.couplings_def["Umu4"] * self.r_eps
                         else:
                             coupling_factor = umu4[i] / self.couplings_def["Umu4"]
                         df_decay = av.select_MB_decay_expo_prob(
@@ -1253,9 +1120,7 @@ class grid_analysis_couplings:
                             l_decay_proper_cm=l_decay,
                         )
                         df_decay = df_decay[df_decay.reco_w > 0]
-                        if (df_decay.reco_w.sum() == 0) or (
-                            df_decay.w_decay_rate_0.sum() == 0
-                        ):
+                        if (df_decay.reco_w.sum() == 0) or (df_decay.w_decay_rate_0.sum() == 0):
                             data[i][5] = -1
                             continue
                         sum_w_post_smearing = np.abs(np.sum(df_decay.reco_w.values))
@@ -1274,9 +1139,7 @@ class grid_analysis_couplings:
                         l_decay_proper_cm = l_decay / coupling_factor**2
 
                         data[i][2] = l_decay_proper_cm
-                        data[i][4] = (
-                            data[i][3] / self.vmu4_def * self.r_eps
-                        ) ** 2 * sum_w_post_smearing
+                        data[i][4] = (data[i][3] / self.vmu4_def * self.r_eps) ** 2 * sum_w_post_smearing
                         data[i][5] = ff.chi2_MiniBooNE_2020(NP_MC, data[i][4])
                         data[i][6] = sum_w_post_smearing
 
@@ -1289,15 +1152,10 @@ class grid_analysis_couplings:
                     return "Failed to run events on the grid!"
 
         elif self.model == "3+2":
-            data_list = [
-                location_fit + f"/chi2_enu_3p2_coupling_{k}.dat"
-                for k in range(self.grid_params["x_points"])
-            ]
+            data_list = [location_fit + f"/chi2_enu_3p2_coupling_{k}.dat" for k in range(self.grid_params["x_points"])]
 
             def chi2_grid(k_x):
-                bin_e = np.array(
-                    [0.2, 0.3, 0.375, 0.475, 0.55, 0.675, 0.8, 0.95, 1.1, 1.3, 1.5, 3.0]
-                )
+                bin_e = np.array([0.2, 0.3, 0.375, 0.475, 0.55, 0.675, 0.8, 0.95, 1.1, 1.3, 1.5, 3.0])
                 couplings = self.params["coupling"]
                 n = self.grid_params["y_points"]
 
@@ -1344,12 +1202,7 @@ class grid_analysis_couplings:
                 data_error = [[m4s, m5s, deltas, 0, 0, 0, -1, mzs] for i in range(n)]
                 try:
                     df = pd.read_parquet(
-                        location
-                        + "/"
-                        + self.experiment
-                        + f"/3plus2/m5_{m5s}_m4_{m4s}_mzprime_{mzs}_"
-                        + self.HNLtype
-                        + "/pandas_df.parquet",
+                        location + "/" + self.experiment + f"/3plus2/m5_{m5s}_m4_{m4s}_mzprime_{mzs}_" + self.HNLtype + "/pandas_df.parquet",
                         engine="pyarrow",
                     )
                     if df.w_event_rate.sum() == 0:
@@ -1363,39 +1216,25 @@ class grid_analysis_couplings:
                         return data_error
 
                     if m5s - m4s < mzs:
-                        df = av.select_MB_decay_expo_prob(
-                            df, coupling_factor=self.r_eps, l_decay_proper_cm=decay_l
-                        )
+                        df = av.select_MB_decay_expo_prob(df, coupling_factor=self.r_eps, l_decay_proper_cm=decay_l)
                         decay_l_norm = decay_l / (self.r_eps) ** 2
-                        data = [
-                            [m4s[k], m5s[k], deltas, decay_l_norm, 0, 0, 0, mzs]
-                            for i in range(n)
-                        ]
+                        data = [[m4s[k], m5s[k], deltas, decay_l_norm, 0, 0, 0, mzs] for i in range(n)]
                     else:
-                        df = av.select_MB_decay_expo_prob(
-                            df, coupling_factor=1, l_decay_proper_cm=decay_l
-                        )
-                        data = [
-                            [m4s[k], m5s[k], deltas, decay_l, 0, 0, 0, mzs]
-                            for i in range(n)
-                        ]
+                        df = av.select_MB_decay_expo_prob(df, coupling_factor=1, l_decay_proper_cm=decay_l)
+                        data = [[m4s[k], m5s[k], deltas, decay_l, 0, 0, 0, mzs] for i in range(n)]
                     df = df[df.reco_w > 0]
 
                     if df.reco_w.sum() == 0:
                         return data_error
 
                     sum_w_post_smearing = np.abs(np.sum(df.reco_w.values))
-                    hist = np.histogram(
-                        df["reco_Enu"], weights=df["reco_w"], bins=bin_e, density=False
-                    )
+                    hist = np.histogram(df["reco_Enu"], weights=df["reco_w"], bins=bin_e, density=False)
                     norm = np.sum(hist[0]) / 550.0
                     NP_MC = (hist[0]) / norm
 
                     for i in range(n):
                         data[i][4] = couplings[i]
-                        data[i][5] = (
-                            couplings[i] / self.vmu5_def * self.r_eps
-                        ) ** 2 * sum_w_post_smearing
+                        data[i][5] = (couplings[i] / self.vmu5_def * self.r_eps) ** 2 * sum_w_post_smearing
                         data[i][6] = ff.chi2_MiniBooNE_2020(NP_MC, data[i][5])
 
                     data_enu = pd.DataFrame(data=data, columns=self.cols)
@@ -1473,26 +1312,9 @@ class grid_analysis_couplings:
         }
         coupling_label = {"3+1": r"$|U_{\mu 4}|^2$", "3+2": r"$|V_{\mu 5}|^2$"}
         if not (plot_path):
-            plot_path = (
-                "./fit_"
-                + self.model[0]
-                + "p"
-                + self.model[2]
-                + "_"
-                + self.HNLtype
-                + "_"
-                + self.experiment
-                + ".jpg"
-            )
+            plot_path = "./fit_" + self.model[0] + "p" + self.model[2] + "_" + self.HNLtype + "_" + self.experiment + ".jpg"
         if not (title):
-            title = (
-                r"Fitting for $E_\nu$, "
-                + self.model
-                + ", "
-                + self.HNLtype
-                + ", "
-                + self.experiment
-            )
+            title = r"Fitting for $E_\nu$, " + self.model + ", " + self.HNLtype + ", " + self.experiment
 
         # plot
         plt.tricontourf(X, Y, Z, levels=levels, cmap="viridis")

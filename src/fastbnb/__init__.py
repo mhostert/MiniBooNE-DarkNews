@@ -1,4 +1,4 @@
-__version__ = "0.0.1"
+__version__ = "0.1.0"
 
 """
     Initializing loggers
@@ -13,3 +13,4 @@ from fastbnb import analysis
 from fastbnb import decayer
 from fastbnb import fastmc
 from fastbnb import plot_tools
+from fastbnb import fit_functions
